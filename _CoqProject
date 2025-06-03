@@ -3,8 +3,6 @@
 -Q src AAC_tactics
 -I src
 
--arg -w -arg +default
-
 src/coq.mli
 src/helper.mli
 src/search_monad.mli
