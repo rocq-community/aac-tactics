@@ -403,10 +403,10 @@ Section Examples.
   (** *** Reverse triangle inequality *)
 
   Lemma Z_abs_triangle : forall x y, Z.abs (x + y) <= Z.abs x + Z.abs y.
-  Proof Z.abs_triangle.
+  Proof. exact Z.abs_triangle. Qed.
 
   Lemma Z_add_opp_diag_r : forall x, x + -x = 0.
-  Proof Z.add_opp_diag_r.
+  Proof. exact Z.add_opp_diag_r. Qed.
 
   (** The following morphisms are required to perform the required rewrites: *)
   #[local] Instance Z_opp_ge_le_compat : Proper (Z.ge ==> Z.le) Z.opp.
