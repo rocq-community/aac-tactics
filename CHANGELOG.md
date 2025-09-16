@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- Renaming to Rocq
 - Clarify tactics and their options in the tutorial, in particular `in_right` for `aac_rewrite`
 
 ## [8.20.0] - 2024-06-27

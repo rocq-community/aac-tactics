@@ -26,7 +26,7 @@ description: |-
 publications:
 - pub_doi: 10.1007/978-3-642-25379-9_14
   pub_url: https://arxiv.org/abs/1106.4448
-  pub_title: Tactics for Reasoning modulo AC in Coq
+  pub_title: Tactics for Reasoning modulo AC in Rocq
 
 authors:
 - name: Thomas Braibant

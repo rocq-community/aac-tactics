@@ -1,16 +1,19 @@
-all: Makefile.coq
-	@+$(MAKE) -f Makefile.coq all
+KNOWNTARGETS := RocqMakefile
+KNOWNFILES   := Makefile _RocqProject
 
-clean: Makefile.coq
-	@+$(MAKE) -f Makefile.coq cleanall
-	@rm -f Makefile.coq Makefile.coq.conf
+.DEFAULT_GOAL := invoke-rocqmakefile
 
-Makefile.coq: _CoqProject
-	$(COQBIN)coq_makefile -f _CoqProject -o Makefile.coq
+RocqMakefile: Makefile _RocqProject
+	$(ROCQBIN)rocq makefile -f _RocqProject -docroot . -o RocqMakefile
 
-force _CoqProject Makefile: ;
+invoke-rocqmakefile: RocqMakefile
+	$(MAKE) --no-print-directory -f RocqMakefile $(filter-out $(KNOWNTARGETS),$(MAKECMDGOALS))
 
-%: Makefile.coq force
-	@+$(MAKE) -f Makefile.coq $@
+.PHONY: invoke-rocqmakefile $(KNOWNFILES)
 
-.PHONY: all clean force tests
+cleanall:: clean
+	rm -f RocqMakefile* *.d *.log */*.glob */.*.aux */*.vo*
+
+# This should be the last rule, to handle any targets not declared above
+%: invoke-rocqmakefile
+	@true

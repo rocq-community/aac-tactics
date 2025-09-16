@@ -1,4 +1,4 @@
-From Coq Require PeanoNat ZArith List Permutation Lia.
+From Stdlib Require PeanoNat ZArith List Permutation Lia.
 From AAC_tactics Require Import AAC.
 From AAC_tactics Require Instances.
 

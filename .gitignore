@@ -22,8 +22,7 @@ src/aac.ml
 .lia.cache
 .nia.cache
 .merlin
-Makefile.coq
-Makefile.coq.conf
-META.coq-aac-tactics
+RocqMakefile*
+META.rocq-aac-tactics
 _build
 docs/
