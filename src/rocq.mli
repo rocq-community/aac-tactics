@@ -6,15 +6,15 @@
 (*       Copyright 2009-2010: Thomas Braibant, Damien Pous.                *)
 (***************************************************************************)
 
-(** Interface with Coq where we define some handlers for Coq's API,
-    and we import several definitions from Coq's standard library.
+(** Interface with Rocq where we define some handlers for Rocq's API,
+    and we import several definitions from Rocq's standard library.
 
     This general purpose library could be reused by other plugins.
    
     Some salient points:
-    - we use Caml's module system to mimic Coq's one, and avoid cluttering
+    - we use Caml's module system to mimic Rocq's one, and avoid cluttering
     the namespace;
-    - we also provide several handlers for standard coq tactics, in
+    - we also provide several handlers for standard Rocq tactics, in
     order to provide a unified setting (we replace functions that
     modify the evar_map by functions that operate on the whole
     goal, and repack the modified evar_map with it).
@@ -23,7 +23,7 @@
 
 type tactic = unit Proofview.tactic
 
-(** {2 Getting Coq terms from the environment}  *)
+(** {2 Getting Rocq terms from the environment}  *)
 type lazy_ref = Names.GlobRef.t Lazy.t
 
 val get_fresh : lazy_ref -> Constr.constr
@@ -44,9 +44,9 @@ val tclRETYPE : EConstr.constr -> unit Proofview.tactic
 
 val decomp_term : Evd.evar_map -> EConstr.constr -> (EConstr.constr , EConstr.types, EConstr.ESorts.t, EConstr.EInstance.t, EConstr.ERelevance.t) Constr.kind_of_term
 
-(** {2 Bindings with Coq' Standard Library}  *)
+(** {2 Bindings with Rocq' Standard Library}  *)
 
-(** Coq lists *)
+(** Rocq lists *)
 module List:
 sig
   (** [of_list ty l]  *)
@@ -56,7 +56,7 @@ sig
   val type_of_list:EConstr.constr ->EConstr.constr
 end
 
-(** Coq pairs *)
+(** Rocq pairs *)
 module Pair:
 sig
   val typ: lazy_ref
@@ -72,21 +72,21 @@ module Option : sig
   val of_option : EConstr.constr -> EConstr.constr option -> EConstr.constr
 end   
 
-(** Coq positive numbers (pos) *)
+(** Rocq positive numbers (pos) *)
 module Pos:
 sig
   val typ:lazy_ref
   val of_int: int ->EConstr.constr
 end
 
-(** Coq unary numbers (peano) *)
+(** Rocq unary numbers (peano) *)
 module Nat:
 sig
   val typ:lazy_ref
   val of_int: int -> Constr.constr
 end
 
-(** Coq typeclasses *)
+(** Rocq typeclasses *)
 module Classes:
 sig
   val mk_morphism: EConstr.constr -> EConstr.constr -> EConstr.constr -> EConstr.constr

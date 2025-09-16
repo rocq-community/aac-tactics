@@ -28,9 +28,9 @@ Register BinNums.xO as aac_tactics.pos.xO.
 Register BinNums.xH as aac_tactics.pos.xH.
 
 From Stdlib Require Classes.Morphisms.
-Register Morphisms.Proper as aac_tactics.coq.classes.morphisms.Proper.
+Register Morphisms.Proper as aac_tactics.rocq.classes.morphisms.Proper.
 From Stdlib Require Classes.RelationClasses.
 
-Register RelationClasses.Equivalence as aac_tactics.coq.RelationClasses.Equivalence.
-Register RelationClasses.Reflexive as aac_tactics.coq.RelationClasses.Reflexive.
-Register RelationClasses.Transitive as aac_tactics.coq.RelationClasses.Transitive.
+Register RelationClasses.Equivalence as aac_tactics.rocq.RelationClasses.Equivalence.
+Register RelationClasses.Reflexive as aac_tactics.rocq.RelationClasses.Reflexive.
+Register RelationClasses.Transitive as aac_tactics.rocq.RelationClasses.Transitive.

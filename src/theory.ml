@@ -32,85 +32,85 @@ module HMap = Hashtbl.Make(Constr)
 module Stubs = struct
 
   (** The constants from the inductive type *)
-  let _Tty = Coq.find_global "internal.T"
+  let _Tty = Rocq.find_global "internal.T"
 
-  let rsum = Coq.find_global "internal.sum"
-  let rprd = Coq.find_global "internal.prd"
-  let rsym = Coq.find_global "internal.sym"
-  let runit = Coq.find_global "internal.unit"
+  let rsum = Rocq.find_global "internal.sum"
+  let rprd = Rocq.find_global "internal.prd"
+  let rsym = Rocq.find_global "internal.sym"
+  let runit = Rocq.find_global "internal.unit"
 
-  let vnil = Coq.find_global "internal.vnil"
-  let vcons = Coq.find_global "internal.vcons"
-  let eval = Coq.find_global "internal.eval"
+  let vnil = Rocq.find_global "internal.vnil"
+  let vcons = Rocq.find_global "internal.vcons"
+  let eval = Rocq.find_global "internal.eval"
 
 
-  let decide_thm = Coq.find_global "internal.decide"
-  let lift_normalise_thm = Coq.find_global "internal.lift_normalise"
+  let decide_thm = Rocq.find_global "internal.decide"
+  let lift_normalise_thm = Rocq.find_global "internal.lift_normalise"
 
-  let lift = Coq.find_global "internal.AAC_lift"
-  let lift_proj_equivalence= Coq.find_global "internal.aac_lift_equivalence"
-  let lift_transitivity_left = Coq.find_global "internal.lift_transitivity_left"
-  let lift_transitivity_right = Coq.find_global "internal.lift_transitivity_right"
-  let lift_reflexivity = Coq.find_global "internal.lift_reflexivity"
+  let lift = Rocq.find_global "internal.AAC_lift"
+  let lift_proj_equivalence= Rocq.find_global "internal.aac_lift_equivalence"
+  let lift_transitivity_left = Rocq.find_global "internal.lift_transitivity_left"
+  let lift_transitivity_right = Rocq.find_global "internal.lift_transitivity_right"
+  let lift_reflexivity = Rocq.find_global "internal.lift_reflexivity"
 end
 
 module Classes = struct
   module Associative = struct
-    let typ = Coq.find_global "classes.Associative"
-    let ty (rlt : Coq.Relation.t) (value : constr) =
-      mkApp (Coq.get_efresh typ, [| rlt.Coq.Relation.carrier;
-				rlt.Coq.Relation.r;
+    let typ = Rocq.find_global "classes.Associative"
+    let ty (rlt : Rocq.Relation.t) (value : constr) =
+      mkApp (Rocq.get_efresh typ, [| rlt.Rocq.Relation.carrier;
+				rlt.Rocq.Relation.r;
 				value
 			     |] )
     let infer env sigma rlt value =
       let ty = ty rlt value in
-      Typeclasses.resolve_one_typeclass env sigma ty
+      Class_tactics.resolve_one_typeclass env sigma ty
   end
 
   module Commutative = struct
-    let typ = Coq.find_global "classes.Commutative"
-    let ty (rlt : Coq.Relation.t) (value : constr) =
-      mkApp (Coq.get_efresh typ, [| rlt.Coq.Relation.carrier;
-				rlt.Coq.Relation.r;
+    let typ = Rocq.find_global "classes.Commutative"
+    let ty (rlt : Rocq.Relation.t) (value : constr) =
+      mkApp (Rocq.get_efresh typ, [| rlt.Rocq.Relation.carrier;
+				rlt.Rocq.Relation.r;
 				value
 			     |] )
 
   end
 
   module Idempotent = struct
-    let typ = Coq.find_global "classes.Idempotent"
-    let ty (rlt : Coq.Relation.t) (value : constr) =
-      mkApp (Coq.get_efresh typ, [| rlt.Coq.Relation.carrier;
-				rlt.Coq.Relation.r;
+    let typ = Rocq.find_global "classes.Idempotent"
+    let ty (rlt : Rocq.Relation.t) (value : constr) =
+      mkApp (Rocq.get_efresh typ, [| rlt.Rocq.Relation.carrier;
+				rlt.Rocq.Relation.r;
 				value
 			     |] )
 
   end
 
   module Proper = struct
-    let typeof =  Coq.find_global "internal.sym.type_of"
-    let relof = Coq.find_global "internal.sym.rel_of"
-    let mk_typeof :  Coq.Relation.t -> int -> constr = fun rlt n ->
-      let x = rlt.Coq.Relation.carrier in
-	mkApp (Coq.get_efresh typeof, [| x ; of_constr (Coq.Nat.of_int n) |])
-    let mk_relof :  Coq.Relation.t -> int -> constr = fun rlt n ->
-      let (x,r) = Coq.Relation.split rlt in
-      mkApp (Coq.get_efresh relof, [| x;r ; of_constr (Coq.Nat.of_int n) |])
+    let typeof =  Rocq.find_global "internal.sym.type_of"
+    let relof = Rocq.find_global "internal.sym.rel_of"
+    let mk_typeof :  Rocq.Relation.t -> int -> constr = fun rlt n ->
+      let x = rlt.Rocq.Relation.carrier in
+	mkApp (Rocq.get_efresh typeof, [| x ; of_constr (Rocq.Nat.of_int n) |])
+    let mk_relof :  Rocq.Relation.t -> int -> constr = fun rlt n ->
+      let (x,r) = Rocq.Relation.split rlt in
+      mkApp (Rocq.get_efresh relof, [| x;r ; of_constr (Rocq.Nat.of_int n) |])
 
     let ty rlt op ar  =
       let typeof = mk_typeof rlt ar in
       let relof = mk_relof rlt ar in
-	Coq.Classes.mk_morphism  typeof relof op
+	Rocq.Classes.mk_morphism  typeof relof op
     let infer env sigma rlt op ar =
       let ty = ty rlt op ar in
-	Typeclasses.resolve_one_typeclass env sigma ty
+	Class_tactics.resolve_one_typeclass env sigma ty
   end
 
   module Unit = struct
-    let typ = Coq.find_global "classes.Unit"
-    let ty (rlt : Coq.Relation.t) (value : constr) (unit : constr)=
-      mkApp (Coq.get_efresh typ, [| rlt.Coq.Relation.carrier;
- 				rlt.Coq.Relation.r;
+    let typ = Rocq.find_global "classes.Unit"
+    let ty (rlt : Rocq.Relation.t) (value : constr) (unit : constr)=
+      mkApp (Rocq.get_efresh typ, [| rlt.Rocq.Relation.carrier;
+ 				rlt.Rocq.Relation.r;
  				value;
  				unit
  			     |] )
@@ -120,12 +120,12 @@ end
 
 (* Non empty lists *)
 module NEList = struct
-  let nil = Coq.find_global "nelist.nil"
-  let cons = Coq.find_global "nelist.cons"
+  let nil = Rocq.find_global "nelist.nil"
+  let cons = Rocq.find_global "nelist.cons"
   let cons ty h t =
-    mkApp (Coq.get_efresh cons, [|  ty; h ; t |])
+    mkApp (Rocq.get_efresh cons, [|  ty; h ; t |])
   let nil ty x =
-    (mkApp (Coq.get_efresh nil, [|  ty ; x|]))
+    (mkApp (Rocq.get_efresh nil, [|  ty ; x|]))
   let rec of_list ty = function
     | [] -> invalid_arg "NELIST"
     | [x] -> nil ty x
@@ -135,11 +135,11 @@ end
 
 (** a [mset] is a ('a * pos) list *)
 let mk_mset ty (l : (constr * int) list) =
-  let pos = Coq.get_efresh Coq.Pos.typ in
+  let pos = Rocq.get_efresh Rocq.Pos.typ in
   let pair (x : constr) (ar : int) =
-    Coq.Pair.of_pair ty pos (x, Coq.Pos.of_int ar)
+    Rocq.Pair.of_pair ty pos (x, Rocq.Pos.of_int ar)
   in
-  let pair_ty = mkApp (Coq.get_efresh Coq.Pair.typ,[| ty ; pos|]) in
+  let pair_ty = mkApp (Rocq.get_efresh Rocq.Pair.typ,[| ty ; pos|]) in
   let rec aux = function
     | [ ] -> assert false
     | [x,ar] -> NEList.nil pair_ty (pair x ar)
@@ -148,17 +148,17 @@ let mk_mset ty (l : (constr * int) list) =
     aux l
 
 module Sigma = struct
-  let sigma_empty = Coq.find_global "sigma.empty"
-  let sigma_add = Coq.find_global "sigma.add"
-  let sigma_get = Coq.find_global "sigma.get"
+  let sigma_empty = Rocq.find_global "sigma.empty"
+  let sigma_add = Rocq.find_global "sigma.add"
+  let sigma_get = Rocq.find_global "sigma.get"
 
   let add ty n x map =
-    mkApp (Coq.get_efresh sigma_add,[|ty; n; x ;  map|])
+    mkApp (Rocq.get_efresh sigma_add,[|ty; n; x ;  map|])
   let empty ty =
-    mkApp (Coq.get_efresh sigma_empty,[|ty |])
+    mkApp (Rocq.get_efresh sigma_empty,[|ty |])
 
   let to_fun ty null map =
-    mkApp (Coq.get_efresh sigma_get, [|ty;null;map|])
+    mkApp (Rocq.get_efresh sigma_get, [|ty;null;map|])
 
   let of_list ty null l =
     match l with
@@ -167,7 +167,7 @@ module Sigma = struct
 	    List.fold_left
 	      (fun acc (i,t) ->
 		 assert (i > 0);
-		 add ty (Coq.Pos.of_int i) ( t) acc)
+		 add ty (Rocq.Pos.of_int i) ( t) acc)
 	      (empty ty)
 	      q
 	  in to_fun ty (t) map
@@ -179,20 +179,20 @@ end
 
 module Sym = struct
   type pack = {ar: Constr.t; value: Constr.t ; morph: Constr.t}
-  let typ = Coq.find_global "sym.pack"
-  let mkPack = Coq.find_global "sym.mkPack"
-  let null = Coq.find_global "sym.null"
-  let mk_pack (rlt: Coq.Relation.t) s =
-    let (x,r) = Coq.Relation.split rlt in
-      mkApp (Coq.get_efresh mkPack, [|x;r; EConstr.of_constr s.ar;EConstr.of_constr s.value;EConstr.of_constr s.morph|])
+  let typ = Rocq.find_global "sym.pack"
+  let mkPack = Rocq.find_global "sym.mkPack"
+  let null = Rocq.find_global "sym.null"
+  let mk_pack (rlt: Rocq.Relation.t) s =
+    let (x,r) = Rocq.Relation.split rlt in
+      mkApp (Rocq.get_efresh mkPack, [|x;r; EConstr.of_constr s.ar;EConstr.of_constr s.value;EConstr.of_constr s.morph|])
   let null  rlt =
-    let x = rlt.Coq.Relation.carrier in
-    let r = rlt.Coq.Relation.r in
-      mkApp (Coq.get_efresh null, [| x;r;|])
+    let x = rlt.Rocq.Relation.carrier in
+    let r = rlt.Rocq.Relation.r in
+      mkApp (Rocq.get_efresh null, [| x;r;|])
 
-  let mk_ty : Coq.Relation.t -> constr = fun rlt ->
-    let (x,r) = Coq.Relation.split rlt in
-      mkApp (Coq.get_efresh typ, [| x; r|] )
+  let mk_ty : Rocq.Relation.t -> constr = fun rlt ->
+    let (x,r) = Rocq.Relation.split rlt in
+      mkApp (Rocq.get_efresh typ, [| x; r|] )
 end
 
 module Bin =struct
@@ -203,30 +203,30 @@ module Bin =struct
 	       idem : Constr.t option;
 	      }
 
-  let typ = Coq.find_global "bin.pack"
-  let mkPack = Coq.find_global "bin.mkPack"
+  let typ = Rocq.find_global "bin.pack"
+  let mkPack = Rocq.find_global "bin.mkPack"
 
-  let mk_pack: Coq.Relation.t -> pack -> constr = fun (rlt) s ->
-    let (x,r) = Coq.Relation.split rlt in
+  let mk_pack: Rocq.Relation.t -> pack -> constr = fun (rlt) s ->
+    let (x,r) = Rocq.Relation.split rlt in
     let comm_ty = Classes.Commutative.ty rlt (EConstr.of_constr s.value) in
     let idem_ty = Classes.Idempotent.ty rlt (EConstr.of_constr s.value) in
-    mkApp (Coq.get_efresh mkPack , [| x ; r;
+    mkApp (Rocq.get_efresh mkPack , [| x ; r;
 				  EConstr.of_constr s.value;
 				  EConstr.of_constr s.compat ;
 				  EConstr.of_constr s.assoc;
-				  Coq.Option.of_option comm_ty (Option.map EConstr.of_constr s.comm);
-				  Coq.Option.of_option idem_ty (Option.map EConstr.of_constr s.idem)
+				  Rocq.Option.of_option comm_ty (Option.map EConstr.of_constr s.comm);
+				  Rocq.Option.of_option idem_ty (Option.map EConstr.of_constr s.idem)
 			       |])
-  let mk_ty : Coq.Relation.t -> constr = fun rlt ->
-   let (x,r) = Coq.Relation.split rlt in
-      mkApp (Coq.get_efresh typ, [| x; r|] )
+  let mk_ty : Rocq.Relation.t -> constr = fun rlt ->
+   let (x,r) = Rocq.Relation.split rlt in
+      mkApp (Rocq.get_efresh typ, [| x; r|] )
 end
 
 module Unit = struct
-  let unit_of_ty = Coq.find_global "internal.unit_of"
-  let unit_pack_ty = Coq.find_global "internal.unit_pack"
-  let mk_unit_of = Coq.find_global "internal.mk_unit_for"
-  let mk_unit_pack = Coq.find_global "internal.mk_unit_pack"
+  let unit_of_ty = Rocq.find_global "internal.unit_of"
+  let unit_pack_ty = Rocq.find_global "internal.unit_pack"
+  let mk_unit_of = Rocq.find_global "internal.mk_unit_for"
+  let mk_unit_pack = Rocq.find_global "internal.mk_unit_pack"
 
   type unit_of =
       {
@@ -241,16 +241,16 @@ module Unit = struct
   }
 
   let ty_unit_of rlt  e_bin u =
-    let (x,r) = Coq.Relation.split rlt in
-      mkApp ( Coq.get_efresh unit_of_ty, [| x; r; e_bin; u |])
+    let (x,r) = Rocq.Relation.split rlt in
+      mkApp ( Rocq.get_efresh unit_of_ty, [| x; r; e_bin; u |])
 
   let ty_unit_pack rlt e_bin =
-    let (x,r) = Coq.Relation.split rlt in
-      mkApp (Coq.get_efresh unit_pack_ty, [| x; r; e_bin |])
+    let (x,r) = Rocq.Relation.split rlt in
+      mkApp (Rocq.get_efresh unit_pack_ty, [| x; r; e_bin |])
 
   let mk_unit_of rlt e_bin u unit_of =
-    let (x,r) = Coq.Relation.split rlt in
-    mkApp (Coq.get_efresh mk_unit_of , [| x;
+    let (x,r) = Rocq.Relation.split rlt in
+    mkApp (Rocq.get_efresh mk_unit_of , [| x;
 				      r;
 				      e_bin ;
 				      u;
@@ -259,11 +259,11 @@ module Unit = struct
 				   |])
 
   let mk_pack rlt e_bin pack : constr =
-    let (x,r) = Coq.Relation.split rlt in
+    let (x,r) = Rocq.Relation.split rlt in
     let ty = ty_unit_of rlt e_bin pack.u_value in
     let mk_unit_of = mk_unit_of rlt e_bin pack.u_value in
-    let u_desc =Coq.List.of_list ( ty ) (List.map mk_unit_of pack.u_desc) in
-      mkApp (Coq.get_efresh mk_unit_pack, [|x;r;
+    let u_desc =Rocq.List.of_list ( ty ) (List.map mk_unit_of pack.u_desc) in
+      mkApp (Rocq.get_efresh mk_unit_pack, [|x;r;
 			       e_bin ;
 			       pack.u_value;
 			       u_desc
@@ -284,9 +284,9 @@ let user_error msg =
 
 module Trans = struct
 
-  (** {1 From Coq to Abstract Syntax Trees (AST)}
+  (** {1 From Rocq to Abstract Syntax Trees (AST)}
 
-      This module provides facilities to interpret a Coq term with
+      This module provides facilities to interpret a Rocq term with
       arbitrary operators as an abstract syntax tree. Considering an
       application, we try to infer instances of our classes.
 
@@ -296,7 +296,7 @@ module Trans = struct
       A] can be understood as an [A] operator.
 
       During this reification, we gather some informations that will
-      be used to rebuild Coq terms from AST ( type {!envs})
+      be used to rebuild Rocq terms from AST ( type {!envs})
 
       We use a main hash-table from [constr] to [pack], in order to
       discriminate the various constructors. All these are mixed in
@@ -428,7 +428,7 @@ module Trans = struct
       units. Otherwise, we do not have the ability to rewrite [0 = a +
       a] in [a = ...]*)
   module Gather : sig
-    val gather : Environ.env -> Evd.evar_map -> Coq.Relation.t -> envs -> constr -> Evd.evar_map
+    val gather : Environ.env -> Evd.evar_map -> Rocq.Relation.t -> envs -> constr -> Evd.evar_map
   end
     = struct
 
@@ -446,14 +446,14 @@ module Trans = struct
 	end
 
 
-      let get_unit (rlt : Coq.Relation.t) op env sigma :
+      let get_unit (rlt : Rocq.Relation.t) op env sigma :
 	    (Evd.evar_map * constr * constr ) option=
-	let x = (rlt.Coq.Relation.carrier)  in
+	let x = (rlt.Rocq.Relation.carrier)  in
 	let sigma,unit = Evarutil.new_evar ~typeclass_candidate:true env sigma x in
 	let ty =Classes.Unit.ty rlt  op  unit in
 	let result =
 	  try
-	    let sigma,t = Typeclasses.resolve_one_typeclass env sigma ty in
+	    let sigma,t = Class_tactics.resolve_one_typeclass env sigma ty in
 	    Some (sigma,t,unit)
 	  with Not_found -> None
 	in
@@ -466,25 +466,25 @@ module Trans = struct
 
 
       (** gives back the class and the operator *)
-      let is_bin  (rlt: Coq.Relation.t) (op: constr) env (sigma : Evd.evar_map)
+      let is_bin  (rlt: Rocq.Relation.t) (op: constr) env (sigma : Evd.evar_map)
 	  : (Evd.evar_map * Bin.pack) option =
 	let assoc_ty = Classes.Associative.ty rlt op in
 	let comm_ty = Classes.Commutative.ty rlt op in
 	let idem_ty = Classes.Idempotent.ty rlt op in
 	let proper_ty  = Classes.Proper.ty rlt op 2 in
 	try
-	  let sigma, proper = Typeclasses.resolve_one_typeclass env sigma proper_ty in
-	  let sigma, assoc = Typeclasses.resolve_one_typeclass env sigma assoc_ty in
+	  let sigma, proper = Class_tactics.resolve_one_typeclass env sigma proper_ty in
+	  let sigma, assoc = Class_tactics.resolve_one_typeclass env sigma assoc_ty in
 	  let sigma, comm  =
 	    try
-	      let sigma,comm = Typeclasses.resolve_one_typeclass env sigma comm_ty in
+	      let sigma,comm = Class_tactics.resolve_one_typeclass env sigma comm_ty in
 	      sigma, Some comm
 	    with Not_found ->
 	      sigma, None
 	  in
 	  let sigma, idem  =
 	    try
-	      let sigma,idem = Typeclasses.resolve_one_typeclass env sigma idem_ty in
+	      let sigma,idem = Class_tactics.resolve_one_typeclass env sigma idem_ty in
 	      sigma, Some idem
 	    with Not_found ->
 	      sigma, None
@@ -499,7 +499,7 @@ module Trans = struct
 	  Some (sigma,bin)
 	with |Not_found -> None
 
-      let is_bin (rlt : Coq.Relation.t) (op : constr) env (sigma : Evd.evar_map)=
+      let is_bin (rlt : Rocq.Relation.t) (op : constr) env (sigma : Evd.evar_map)=
 	match is_bin rlt op env sigma with
 	  | None -> None
 	  | Some (sigma, bin_pack) ->
@@ -520,13 +520,13 @@ module Trans = struct
 
     (** {is_morphism} try to infer the kind of operator we are
 	dealing with *)
-      let is_morphism env sigma (rlt : Coq.Relation.t) (papp : constr) (ar : int) : (Evd.evar_map * pack ) option      =
+      let is_morphism env sigma (rlt : Rocq.Relation.t) (papp : constr) (ar : int) : (Evd.evar_map * pack ) option      =
       let typeof = Classes.Proper.mk_typeof rlt ar in
       let relof = Classes.Proper.mk_relof rlt ar in
-      let m = Coq.Classes.mk_morphism  typeof relof  papp in
+      let m = Rocq.Classes.mk_morphism  typeof relof  papp in
 	try
-	  let sigma,m= Typeclasses.resolve_one_typeclass env sigma m in
-	  let pack = {Sym.ar = Coq.Nat.of_int ar;
+	  let sigma,m= Class_tactics.resolve_one_typeclass env sigma m in
+	  let pack = {Sym.ar = Rocq.Nat.of_int ar;
                       Sym.value= EConstr.to_constr sigma papp;
                       Sym.morph= EConstr.to_constr sigma m} in
 	    Some (sigma, Sym pack)
@@ -546,7 +546,7 @@ module Trans = struct
 	  let args = Array.sub ca (n-2) 2 in
 	  Some (papp, args )
 
-    let fold env sigma (rlt : Coq.Relation.t) envs t ca cont =
+    let fold env sigma (rlt : Rocq.Relation.t) envs t ca cont =
       let fold_morphism t ca  =
 	let nb_params = Array.length ca in
 	let rec aux n =
@@ -579,9 +579,9 @@ module Trans = struct
 
     (* update in place the envs of known stuff, using memoization. We
        have to memoize failures, here. *)
-    let gather env sigma (rlt : Coq.Relation.t ) envs t : Evd.evar_map =
+    let gather env sigma (rlt : Rocq.Relation.t ) envs t : Evd.evar_map =
       let rec aux sigma x =
-	match Coq.decomp_term sigma x with
+	match Rocq.decomp_term sigma x with
 	  | Constr.App (t,ca) ->
 	      fold env sigma rlt envs t ca (aux )
 	  | _ ->  sigma
@@ -594,7 +594,7 @@ module Trans = struct
       constants).  *)
   module Parse :
   sig
-    val  t_of_constr : Environ.env -> Evd.evar_map -> Coq.Relation.t -> envs  -> constr -> Matcher.Terms.t * Evd.evar_map
+    val  t_of_constr : Environ.env -> Evd.evar_map -> Rocq.Relation.t -> envs  -> constr -> Matcher.Terms.t * Evd.evar_map
   end
     = struct
 
@@ -615,13 +615,13 @@ module Trans = struct
 	  This functions is prevented to go through [ar < 0] by the fact
 	  that a constant is a morphism. But not an eva. *)
 
-      let is_morphism env sigma (rlt : Coq.Relation.t) (papp : constr) (ar : int) : (Evd.evar_map * pack ) option      =
+      let is_morphism env sigma (rlt : Rocq.Relation.t) (papp : constr) (ar : int) : (Evd.evar_map * pack ) option      =
 	let typeof = Classes.Proper.mk_typeof rlt ar in
 	let relof = Classes.Proper.mk_relof rlt ar in
-	let m = Coq.Classes.mk_morphism  typeof relof  papp in
+	let m = Rocq.Classes.mk_morphism  typeof relof  papp in
 	try
-	  let sigma,m = Typeclasses.resolve_one_typeclass env sigma m in
-	  let pack = {Sym.ar = Coq.Nat.of_int ar;
+	  let sigma,m = Class_tactics.resolve_one_typeclass env sigma m in
+	  let pack = {Sym.ar = Rocq.Nat.of_int ar;
                       Sym.value= EConstr.to_constr ~abort_on_undefined_evars:(false) sigma papp;
                       Sym.morph= EConstr.to_constr ~abort_on_undefined_evars:(false) sigma m} in
 	  Some (sigma, Sym pack)
@@ -629,7 +629,7 @@ module Trans = struct
 	  | e ->  None
 
       exception NotReflexive
-      let discriminate env sigma envs (rlt : Coq.Relation.t) t ca : Evd.evar_map * pack * constr * constr array =
+      let discriminate env sigma envs (rlt : Rocq.Relation.t) t ca : Evd.evar_map * pack * constr * constr array =
 	let nb_params = Array.length ca in
 	let rec fold sigma ar :Evd.evar_map  * pack * constr * constr array =
 	  begin
@@ -673,7 +673,7 @@ module Trans = struct
 
       let discriminate env sigma envs rlt  x =
 	try
-	  match Coq.decomp_term sigma x with
+	  match Rocq.decomp_term sigma x with
 	    | Constr.App (t,ca) ->
 	      discriminate env sigma envs rlt   t ca
 	    | _ -> discriminate env sigma envs rlt x [| |]
@@ -688,10 +688,10 @@ module Trans = struct
 	  of the term [cstr]. Doing so, it modifies the environment of
 	  known stuff [envs], and eventually creates fresh
 	  evars. Therefore, we give back the evar map updated accordingly *)
-      let t_of_constr env sigma (rlt: Coq.Relation.t ) envs  : constr -> Matcher.Terms.t * Evd.evar_map =
+      let t_of_constr env sigma (rlt: Rocq.Relation.t ) envs  : constr -> Matcher.Terms.t * Evd.evar_map =
 	let r_sigma = ref (sigma) in
 	let rec aux x =
-	  match Coq.decomp_term sigma x with
+	  match Rocq.decomp_term sigma x with
 	    | Constr.Rel i -> Matcher.Terms.Var i
 	    | _ ->
 		let sigma, pack , p_app, ca = discriminate env (!r_sigma) envs rlt   x in
@@ -768,7 +768,7 @@ module Trans = struct
 
   let ir_to_units ir = ir.matcher_units
 
-  let ir_of_envs env sigma (rlt : Coq.Relation.t) envs =
+  let ir_of_envs env sigma (rlt : Rocq.Relation.t) envs =
     let add x y l = (x,y)::l in
     let  nil = [] in
     let sym ,
@@ -819,7 +819,7 @@ module Trans = struct
 		    if Constr.equal (unit_of.Unit.uf_u) u
 		    then
 		      {unit_of with
-			Unit.uf_idx = EConstr.to_constr sigma (Coq.Pos.of_int nop)} :: acc
+			Unit.uf_idx = EConstr.to_constr sigma (Rocq.Pos.of_int nop)} :: acc
 		    else
 		      acc
 	      )
@@ -843,10 +843,10 @@ module Trans = struct
 
 
 
-  (** {1 From AST back to Coq }
+  (** {1 From AST back to Rocq }
 
       The next functions allow one to map OCaml abstract syntax trees
-      to Coq terms *)
+      to Rocq terms *)
 
  (** {2 Building raw, natural, terms} *)
 
@@ -925,7 +925,7 @@ module Trans = struct
 
 
   (** A record containing the environments that will be needed by the
-      decision procedure, as a Coq constr. Contains the functions
+      decision procedure, as a Rocq constr. Contains the functions
       from the symbols (as ints) to indexes (as constr) *)
 
   type sigmas = {
@@ -947,12 +947,12 @@ module Trans = struct
   (* Note : this function can fail if the user is using the wrong
      relation, like proving a = b, while the classes are defined with
      another relation (==) *)
-  let build_reif_params env sigma (rlt : Coq.Relation.t) (zero) :
+  let build_reif_params env sigma (rlt : Rocq.Relation.t) (zero) :
         Evd.evar_map * reif_params =
-    let carrier = rlt.Coq.Relation.carrier in
+    let carrier = rlt.Rocq.Relation.carrier in
     let sigma,bin_null =
       try
-        let sigma, op = Coq.evar_binary env sigma carrier in
+        let sigma, op = Rocq.evar_binary env sigma carrier in
 	let sigma, assoc = Classes.Associative.infer env sigma rlt op in
 	let sigma, compat = Classes.Proper.infer env sigma rlt op 2 in
 	let op = Evarutil.nf_evar sigma op in
@@ -967,10 +967,10 @@ module Trans = struct
     in
     let sigma,zero =
       try
-        let sigma, evar_op = Coq.evar_binary env sigma carrier in
+        let sigma, evar_op = Rocq.evar_binary env sigma carrier in
 	let sigma,evar_unit = Evarutil.new_evar ~typeclass_candidate:true env sigma carrier in
 	let query = Classes.Unit.ty rlt evar_op evar_unit in
-	let sigma, _ = Typeclasses.resolve_one_typeclass env sigma query in
+	let sigma, _ = Class_tactics.resolve_one_typeclass env sigma query in
 	sigma,Evarutil.nf_evar sigma evar_unit
       with _ -> sigma,zero in
     let sym_null = Sym.null rlt in
@@ -988,7 +988,7 @@ module Trans = struct
 
   (** [build_sigma_maps] given a envs and some reif_params, we are
       able to build the sigmas *)
-  let build_sigma_maps (rlt : Coq.Relation.t) zero ir : (sigmas * sigma_maps) Proofview.tactic =
+  let build_sigma_maps (rlt : Rocq.Relation.t) zero ir : (sigmas * sigma_maps) Proofview.tactic =
     let open Proofview.Notations in
     Proofview.Goal.enter_one (fun goal ->
         let env = Proofview.Goal.env goal in
@@ -1000,7 +1000,7 @@ module Trans = struct
                             (rp.sym_null)
                             ir.sym
             in 
-            Coq.mk_letin "env_sym" env_sym >>= fun env_sym ->
+            Rocq.mk_letin "env_sym" env_sym >>= fun env_sym ->
             let bin = (List.map ( fun (n,s) -> n, Bin.mk_pack rlt s) ir.bin) in
             let env_bin =
               Sigma.of_list
@@ -1009,7 +1009,7 @@ module Trans = struct
 	        bin
             in
             (* let goalE = Proofview.Goal.goal goal in *)
-            Coq.mk_letin "env_bin" env_bin >>= fun env_bin ->
+            Rocq.mk_letin "env_bin" env_bin >>= fun env_bin ->
             let units = (List.map (fun (n,s) -> n, Unit.mk_pack rlt env_bin s)ir.units) in
             let env_units =
               Sigma.of_list
@@ -1017,14 +1017,14 @@ module Trans = struct
 	        (Unit.mk_pack rlt env_bin rp.unit_null )
 	        units
             in
-            Coq.mk_letin "env_units" env_units >>= fun env_units ->
+            Rocq.mk_letin "env_units" env_units >>= fun env_units ->
             let sigmas =
               {
 	        env_sym =  env_sym ;
 	        env_bin =  env_bin ;
 	        env_units  = env_units;
               } in
-            let f = List.map (fun (x,_) -> (x,Coq.Pos.of_int x)) in
+            let f = List.map (fun (x,_) -> (x,Rocq.Pos.of_int x)) in
             let sigma_maps =
               {
 	        sym_to_pos = (let sym = f ir.sym in fun x ->  (List.assoc x sym));
@@ -1054,7 +1054,7 @@ module Trans = struct
       | n  -> let n = n-1 in
 	  mkApp( vcons,
  		 [|
-		   of_constr (Coq.Nat.of_int n);
+		   of_constr (Rocq.Nat.of_int n);
 		   v.(ar - 1 - n);
 		   (aux (n))
 		 |]
@@ -1062,24 +1062,24 @@ module Trans = struct
     in aux ar
 
   (* TODO: use a do notation *)
-  let mk_reif_builders  (rlt: Coq.Relation.t)   (env_sym:constr) : (reif_builders Proofview.tactic) =
-    let x = (rlt.Coq.Relation.carrier) in
-    let r = (rlt.Coq.Relation.r) in
+  let mk_reif_builders  (rlt: Rocq.Relation.t)   (env_sym:constr) : (reif_builders Proofview.tactic) =
+    let x = (rlt.Rocq.Relation.carrier) in
+    let r = (rlt.Rocq.Relation.r) in
 
     let x_r_env = [|x;r;env_sym|] in
-    let tty =  mkApp (Coq.get_efresh Stubs._Tty, x_r_env) in
-    let rsum = mkApp (Coq.get_efresh Stubs.rsum, x_r_env) in
-    let rprd = mkApp (Coq.get_efresh Stubs.rprd, x_r_env) in
-    let rsym = mkApp (Coq.get_efresh Stubs.rsym, x_r_env) in
-    let vnil = mkApp (Coq.get_efresh Stubs.vnil, x_r_env) in
-    let vcons = mkApp (Coq.get_efresh Stubs.vcons, x_r_env) in
+    let tty =  mkApp (Rocq.get_efresh Stubs._Tty, x_r_env) in
+    let rsum = mkApp (Rocq.get_efresh Stubs.rsum, x_r_env) in
+    let rprd = mkApp (Rocq.get_efresh Stubs.rprd, x_r_env) in
+    let rsym = mkApp (Rocq.get_efresh Stubs.rsym, x_r_env) in
+    let vnil = mkApp (Rocq.get_efresh Stubs.vnil, x_r_env) in
+    let vcons = mkApp (Rocq.get_efresh Stubs.vcons, x_r_env) in
     let open Proofview.Notations in
-    Coq.mk_letin "tty" tty >>= fun tty ->
-    Coq.mk_letin "rsum" rsum >>= fun rsum ->
-    Coq.mk_letin "rprd" rprd >>= fun rprd ->
-    Coq.mk_letin "rsym" rsym >>= fun rsym ->
-    Coq.mk_letin "vnil" vnil >>= fun vnil ->
-    Coq.mk_letin "vcons" vcons >>= fun vcons ->
+    Rocq.mk_letin "tty" tty >>= fun tty ->
+    Rocq.mk_letin "rsum" rsum >>= fun rsum ->
+    Rocq.mk_letin "rprd" rprd >>= fun rprd ->
+    Rocq.mk_letin "rsym" rsym >>= fun rsym ->
+    Rocq.mk_letin "vnil" vnil >>= fun vnil ->
+    Rocq.mk_letin "vcons" vcons >>= fun vcons ->
     Proofview.tclUNIT {
 	rsum =
 	  begin fun idx l r ->
@@ -1096,7 +1096,7 @@ module Trans = struct
 	  mkApp (rsym, [| idx; vect|])
 	  end;
 	runit = fun idx -> 	(* could benefit of a letin *)
-	        mkApp (Coq.get_efresh Stubs.runit , [|x;r;env_sym;idx; |])
+	        mkApp (Rocq.get_efresh Stubs.runit , [|x;r;env_sym;idx; |])
       }
 
 

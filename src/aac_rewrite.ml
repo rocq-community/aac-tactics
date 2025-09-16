@@ -43,52 +43,52 @@ open Names
     lift connects the two things *)
 type aac_lift =
     {
-      r : Coq.Relation.t;
-      e : Coq.Equivalence.t;
+      r : Rocq.Relation.t;
+      e : Rocq.Equivalence.t;
       lift : constr
     }
 
 type rewinfo =
     {
-      hypinfo : Coq.Rewrite.hypinfo;
+      hypinfo : Rocq.Rewrite.hypinfo;
 
       in_left : bool; 	     		(** are we rewriting in the left hand-sie of the goal *)
       pattern : constr;
       subject : constr;
-      morph_rlt : Coq.Relation.t; (** the relation we look for in morphism *)
-      eqt : Coq.Equivalence.t;    (** the equivalence we use as workbase *)
-      rlt : Coq.Relation.t;	  (** the relation in the goal  *)
+      morph_rlt : Rocq.Relation.t; (** the relation we look for in morphism *)
+      eqt : Rocq.Equivalence.t;    (** the equivalence we use as workbase *)
+      rlt : Rocq.Relation.t;	  (** the relation in the goal  *)
       lifting: aac_lift
     }
 
-let infer_lifting env sigma (rlt: Coq.Relation.t) : Evd.evar_map * aac_lift  =
-  let x = rlt.Coq.Relation.carrier in
-  let r = rlt.Coq.Relation.r in
-  let (sigma, e) = Coq.evar_relation env sigma x in
-  let lift_ty = mkApp (Coq.get_efresh Theory.Stubs.lift,[|x;r;e|]) in
-  let sigma, lift = try Typeclasses.resolve_one_typeclass env sigma lift_ty
+let infer_lifting env sigma (rlt: Rocq.Relation.t) : Evd.evar_map * aac_lift  =
+  let x = rlt.Rocq.Relation.carrier in
+  let r = rlt.Rocq.Relation.r in
+  let (sigma, e) = Rocq.evar_relation env sigma x in
+  let lift_ty = mkApp (Rocq.get_efresh Theory.Stubs.lift,[|x;r;e|]) in
+  let sigma, lift = try Class_tactics.resolve_one_typeclass env sigma lift_ty
                     with Not_found -> CErrors.user_err (Pp.strbrk "Cannot infer a lifting")
   in
   let eq = (Evarutil.nf_evar sigma e) in
-  let equiv = mkApp (Coq.get_efresh Theory.Stubs.lift_proj_equivalence,[| x;r;eq; lift |]) in
+  let equiv = mkApp (Rocq.get_efresh Theory.Stubs.lift_proj_equivalence,[| x;r;eq; lift |]) in
   sigma, {
       r = rlt;
-      e = Coq.Equivalence.make x eq equiv;
+      e = Rocq.Equivalence.make x eq equiv;
       lift = lift;
     }
   
 
 (** Builds a rewinfo, once and for all *)
 let dispatch env sigma in_left (left,right,rlt) hypinfo : Evd.evar_map * rewinfo =
-  let l2r = hypinfo.Coq.Rewrite.l2r in
+  let l2r = hypinfo.Rocq.Rewrite.l2r in
   let sigma,lift = infer_lifting env sigma rlt in
   let eq = lift.e in
   sigma,{
       hypinfo = hypinfo;
       in_left = in_left;
-      pattern = if l2r then hypinfo.Coq.Rewrite.left else hypinfo.Coq.Rewrite.right;
+      pattern = if l2r then hypinfo.Rocq.Rewrite.left else hypinfo.Rocq.Rewrite.right;
       subject = if in_left then left else right;
-      morph_rlt = Coq.Equivalence.to_relation eq;
+      morph_rlt = Rocq.Equivalence.to_relation eq;
       eqt = eq;
       lifting = lift;
       rlt = rlt
@@ -100,18 +100,18 @@ let dispatch env sigma in_left (left,right,rlt) hypinfo : Evd.evar_map * rewinfo
 
 (** Build the reifiers, the reified terms, and the evaluation fonction  *)
 let handle eqt zero envs (t : Matcher.Terms.t) (t' : Matcher.Terms.t) : ('a * 'b * 'c * 'd) Proofview.tactic=
-  let (x,r,_) = Coq.Equivalence.split eqt  in
+  let (x,r,_) = Rocq.Equivalence.split eqt  in
   let open Proofview.Notations in
-  Theory.Trans.mk_reifier (Coq.Equivalence.to_relation eqt) zero envs >>= fun (maps, reifier) ->
+  Theory.Trans.mk_reifier (Rocq.Equivalence.to_relation eqt) zero envs >>= fun (maps, reifier) ->
   (* fold through a term and reify *)
   let t = Theory.Trans.reif_constr_of_t reifier t in
   let t' = Theory.Trans.reif_constr_of_t reifier  t' in
   (* Some letins  *)
-  let eval = (mkApp (Coq.get_efresh Theory.Stubs.eval, [|x;r; maps.Theory.Trans.env_sym; maps.Theory.Trans.env_bin; maps.Theory.Trans.env_units|])) in
+  let eval = (mkApp (Rocq.get_efresh Theory.Stubs.eval, [|x;r; maps.Theory.Trans.env_sym; maps.Theory.Trans.env_bin; maps.Theory.Trans.env_units|])) in
 
-  Coq.mk_letin "eval" eval >>= fun eval ->
-  Coq.mk_letin "left" t >>= fun t ->
-  Coq.mk_letin "right" t' >>= fun t' ->
+  Rocq.mk_letin "eval" eval >>= fun eval ->
+  Rocq.mk_letin "left" t >>= fun t ->
+  Rocq.mk_letin "right" t' >>= fun t' ->
   Proofview.tclUNIT (maps, eval, t,t')
                                    
 (** [by_aac_reflexivity] is a sub-tactic that closes a sub-goal that
@@ -120,8 +120,8 @@ let by_aac_reflexivity zero
       eqt envs (t : Matcher.Terms.t) (t' : Matcher.Terms.t) : unit Proofview.tactic =
   let open Proofview.Notations in
   handle eqt zero envs t t' >>= fun (maps,eval,t,t') ->
-  let (x,r,e) = Coq.Equivalence.split eqt in
-  let decision_thm = mkApp (Coq.get_efresh Theory.Stubs.decide_thm,
+  let (x,r,e) = Rocq.Equivalence.split eqt in
+  let decision_thm = mkApp (Rocq.get_efresh Theory.Stubs.decide_thm,
 	               [|x;r;e;
 	                 maps.Theory.Trans.env_sym;
 	                 maps.Theory.Trans.env_bin;
@@ -135,11 +135,11 @@ let by_aac_reflexivity zero
   let convert = Tactics.convert_concl ~cast:true ~check:true convert_to Constr.DEFAULTcast in
   let apply_tac = Tactics.apply decision_thm in
   let open Proofview in
-  Coq.tclRETYPE decision_thm
-  <*> Coq.tclRETYPE convert_to
+  Rocq.tclRETYPE decision_thm
+  <*> Rocq.tclRETYPE convert_to
   <*> convert
-  <*> tclTac_or_exn apply_tac Coq.user_error (Pp.strbrk "unification failure")
-  <*> tclTac_or_exn (time_tac "vm_norm" Tactics.normalise_in_concl) Coq.anomaly "vm_compute failure"
+  <*> tclTac_or_exn apply_tac Rocq.user_error (Pp.strbrk "unification failure")
+  <*> tclTac_or_exn (time_tac "vm_norm" Tactics.normalise_in_concl) Rocq.anomaly "vm_compute failure"
   <*> tclORELSE Tactics.reflexivity
 	(fun _ -> Tacticals.tclFAIL (Pp.str "Not an equality modulo A/AC"))
   
@@ -150,24 +150,24 @@ let by_aac_normalise zero lift ir t t' =
   let rlt = lift.r in
   let open Proofview.Notations in
   handle eqt zero ir t t' >>= fun (maps,eval,t,t') ->
-  let (x,r,e) = Coq.Equivalence.split eqt in
-  let normalise_thm = mkApp (Coq.get_efresh Theory.Stubs.lift_normalise_thm,
+  let (x,r,e) = Rocq.Equivalence.split eqt in
+  let normalise_thm = mkApp (Rocq.get_efresh Theory.Stubs.lift_normalise_thm,
 	                [|x;r;e;
 	                  maps.Theory.Trans.env_sym;
 	                  maps.Theory.Trans.env_bin;
 	                  maps.Theory.Trans.env_units;
-	                  rlt.Coq.Relation.r;
+	                  rlt.Rocq.Relation.r;
 	                  lift.lift;
 	                  t;t';
 	                |])
   in
   (* This convert is required to deal with evars in a proper
      way *)
-  let convert_to = mkApp (rlt.Coq.Relation.r, [| mkApp (eval,[| t |]); mkApp (eval, [|t'|])|])   in
+  let convert_to = mkApp (rlt.Rocq.Relation.r, [| mkApp (eval,[| t |]); mkApp (eval, [|t'|])|])   in
   let convert = Tactics.convert_concl ~cast:true ~check:true convert_to Constr.DEFAULTcast in
   let apply_tac = Tactics.apply normalise_thm in
   Tacticals.tclTHENLIST
-    [ Coq.tclRETYPE normalise_thm; Coq.tclRETYPE convert_to;
+    [ Rocq.tclRETYPE normalise_thm; Rocq.tclRETYPE convert_to;
        convert ;
        apply_tac;
      ]
@@ -178,17 +178,17 @@ let by_aac_normalise zero lift ir t t' =
 let aac_conclude env sigma (concl:types): ( Evd.evar_map * constr * aac_lift * Theory.Trans.ir * Matcher.Terms.t * Matcher.Terms.t) =
   let envs = Theory.Trans.empty_envs () in
   let left, right,r =
-    match Coq.match_as_equation env sigma concl with
-    | None -> Coq.user_error @@ Pp.strbrk "The goal is not an applied relation"
+    match Rocq.match_as_equation env sigma concl with
+    | None -> Rocq.user_error @@ Pp.strbrk "The goal is not an applied relation"
     | Some x -> x in
   try let sigma,lift = infer_lifting env sigma r in
-      let eq = Coq.Equivalence.to_relation lift.e in
+      let eq = Rocq.Equivalence.to_relation lift.e in
       let tleft,tright, sigma = Theory.Trans.t_of_constr env sigma eq envs (left,right) in
       let sigma, ir = Theory.Trans.ir_of_envs env sigma eq envs in
       let () = Debug.pr_constr env sigma "concl" concl in
       (sigma,left,lift,ir,tleft,tright)
   with
-  | Not_found -> Coq.user_error @@ Pp.strbrk "No lifting from the goal's relation to an equivalence"
+  | Not_found -> Rocq.user_error @@ Pp.strbrk "No lifting from the goal's relation to an equivalence"
 
 open Tacexpr
 
@@ -219,31 +219,31 @@ let aac_reflexivity : unit Proofview.tactic =
       let sigma = Proofview.Goal.sigma goal in
       let concl = Goal.concl goal in
       let sigma,zero,lift,ir,t,t' = aac_conclude env sigma concl in
-      let x,r = Coq.Relation.split (lift.r) in
-      let r_reflexive = (Coq.Classes.mk_reflexive x r) in
-      let sigma,reflexive = try Typeclasses.resolve_one_typeclass env sigma r_reflexive
-                            with | Not_found -> Coq.user_error @@ Pp.strbrk "The goal's relation is not reflexive"
+      let x,r = Rocq.Relation.split (lift.r) in
+      let r_reflexive = (Rocq.Classes.mk_reflexive x r) in
+      let sigma,reflexive = try Class_tactics.resolve_one_typeclass env sigma r_reflexive
+                            with | Not_found -> Rocq.user_error @@ Pp.strbrk "The goal's relation is not reflexive"
       in
       let lift_reflexivity =
-        mkApp (Coq.get_efresh (Theory.Stubs.lift_reflexivity),
-	       [| x; r; lift.e.Coq.Equivalence.eq; lift.lift; reflexive |])
+        mkApp (Rocq.get_efresh (Theory.Stubs.lift_reflexivity),
+	       [| x; r; lift.e.Rocq.Equivalence.eq; lift.lift; reflexive |])
       in
       Unsafe.tclEVARS sigma
-      <*> Coq.tclRETYPE lift_reflexivity
+      <*> Rocq.tclRETYPE lift_reflexivity
       <*> Tactics.apply lift_reflexivity
       <*> by_aac_reflexivity zero lift.e ir t t')
 
 
 (** A sub-tactic to lift the rewriting using Lift  *)
-let lift_transitivity in_left (step:constr) preorder lifting (using_eq : Coq.Equivalence.t): unit Proofview.tactic =
+let lift_transitivity in_left (step:constr) preorder lifting (using_eq : Rocq.Equivalence.t): unit Proofview.tactic =
   Proofview.Goal.enter (fun goal ->
       (* catch the equation and the two members*)
       let concl = Proofview.Goal.concl goal in
       let env = Proofview.Goal.env goal in
       let sigma = Proofview.Goal.sigma goal in
-      let (left, right, _ ) = match  Coq.match_as_equation env sigma concl with
+      let (left, right, _ ) = match  Rocq.match_as_equation env sigma concl with
         | Some x -> x
-        | None -> Coq.user_error @@ Pp.strbrk "The goal is not an equation"
+        | None -> Rocq.user_error @@ Pp.strbrk "The goal is not an equation"
       in
       let lift_transitivity =
         let thm =
@@ -253,11 +253,11 @@ let lift_transitivity in_left (step:constr) preorder lifting (using_eq : Coq.Equ
 	  else
 	    Theory.Stubs.lift_transitivity_right
         in
-        mkApp (Coq.get_efresh thm,
+        mkApp (Rocq.get_efresh thm,
 	       [|
-	         preorder.Coq.Relation.carrier;
-	         preorder.Coq.Relation.r;
-	         using_eq.Coq.Equivalence.eq;
+	         preorder.Rocq.Relation.carrier;
+	         preorder.Rocq.Relation.r;
+	         using_eq.Rocq.Equivalence.eq;
 	         lifting;
 	         step;
 	         left;
@@ -265,7 +265,7 @@ let lift_transitivity in_left (step:constr) preorder lifting (using_eq : Coq.Equ
 	       |])
       in
       Tacticals.tclTHENLIST
-        [ Coq.tclRETYPE lift_transitivity;
+        [ Rocq.tclRETYPE lift_transitivity;
           Tactics.apply lift_transitivity
         ]
     )
@@ -283,9 +283,9 @@ let core_aac_rewrite ?abort
       let tran_tac =
         lift_transitivity rewinfo.in_left tr rewinfo.rlt rewinfo.lifting.lift rewinfo.eqt
       in
-      let rew = Coq.Rewrite.rewrite ?abort rewinfo.hypinfo subst in
+      let rew = Rocq.Rewrite.rewrite ?abort rewinfo.hypinfo subst in
       Tacticals.tclTHENS
-        (tclTac_or_exn (tran_tac) Coq.anomaly "Unable to make the transitivity step")
+        (tclTac_or_exn (tran_tac) Rocq.anomaly "Unable to make the transitivity step")
         (
 	  if rewinfo.in_left
 	  then [ by_aac_reflexivity left t ; rew ]
@@ -327,14 +327,14 @@ let aac_rewrite_wrap  ?abort ?(l2r=true) ?(show = false) ?(in_left=true) ?strict
       let env = Proofview.Goal.env goal in
       let sigma = Proofview.Goal.sigma goal in
       let (_,_,rlt) as concl =
-        match Coq.match_as_equation env sigma concl with
-        | None -> Coq.user_error @@ Pp.strbrk "The goal is not an applied relation"
+        match Rocq.match_as_equation env sigma concl with
+        | None -> Rocq.user_error @@ Pp.strbrk "The goal is not an applied relation"
         | Some (left, right, rlt) -> left,right,rlt
       in
       let check_type x =
-        Tacmach.pf_conv_x goal x rlt.Coq.Relation.carrier
+        Tacmach.pf_conv_x goal x rlt.Rocq.Relation.carrier
       in
-      let hypinfo = Coq.Rewrite.get_hypinfo env sigma ?check_type:(Some check_type) rew ~l2r in
+      let hypinfo = Rocq.Rewrite.get_hypinfo env sigma ?check_type:(Some check_type) rew ~l2r in
       let sigma,rewinfo = dispatch env sigma in_left concl hypinfo in
       let sigma =
         match extra with
@@ -355,14 +355,14 @@ let aac_rewrite_wrap  ?abort ?(l2r=true) ?(show = false) ?(in_left=true) ?strict
 
           (if show
            then
-             Print.print rewinfo.morph_rlt ir m (hypinfo.Coq.Rewrite.context)
+             Print.print rewinfo.morph_rlt ir m (hypinfo.Rocq.Rewrite.context)
            else
              try
                let pat,subst = choose_subst occ_subterm occ_sol m in
                let tr_step = Matcher.Subst.instantiate subst pat in
                let tr_step_raw = Theory.Trans.raw_constr_of_t ir rewinfo.morph_rlt [] tr_step in
 
-               let conv = (Theory.Trans.raw_constr_of_t ir rewinfo.morph_rlt (hypinfo.Coq.Rewrite.context)) in
+               let conv = (Theory.Trans.raw_constr_of_t ir rewinfo.morph_rlt (hypinfo.Rocq.Rewrite.context)) in
                let subst  = Matcher.Subst.to_list subst in
                let subst = List.map (fun (x,y) -> x, conv y) subst in
                let by_aac_reflexivity = (by_aac_reflexivity rewinfo.subject rewinfo.eqt  ir) in
@@ -389,7 +389,7 @@ let aac_rewrite ~args =
 let rec add k x = function
   | [] -> [k,x]
   | k',_ as ky::q ->
-      if k'=k then Coq.user_error @@ Pp.strbrk ("redondant argument ("^k^")")
+      if k'=k then Rocq.user_error @@ Pp.strbrk ("redondant argument ("^k^")")
       else ky::add k x q
 
 let pr_aac_args _ _ _ l =

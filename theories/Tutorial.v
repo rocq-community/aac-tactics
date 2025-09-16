@@ -145,7 +145,7 @@ Section base.
     Goal f(a+a)+f(a+a) == f a.
       (* in case there are several possible solutions, one can print
         the different solutions using the [aac_instances] tactic (in
-        ProofGeneral, look at the *coq* buffer): *)
+        ProofGeneral, look at the *Rocq* buffer): *)
       aac_instances H.
       (* the default choice is the occurrence with the smallest
         possible context (number 0), but one can choose the desired one *)

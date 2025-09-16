@@ -960,7 +960,7 @@ Section t.
 
 End t.
        
-Declare ML Module "coq-aac-tactics.plugin".
+Declare ML Module "rocq-aac-tactics.plugin".
 
 Lemma transitivity4 {A R} {H: @Equivalence A R} a b a' b': R a a' -> R b b' -> R a b -> R a' b'.
 Proof. now intros -> ->. Qed.

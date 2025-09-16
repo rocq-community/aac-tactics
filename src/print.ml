@@ -65,7 +65,7 @@ let pp_all pt : (int * Terms.t * named_env Search_monad.m) Search_monad.m -> Pp.
     List.fold_left (fun acc s -> s ++ str "\n" ++ acc) (str "") (s)
 
 (** The main printing function. {!print} uses the debruijn_env the
-rename the variables, and rebuilds raw Coq terms (for the context, and
+rename the variables, and rebuilds raw Rocq terms (for the context, and
 the terms in the environment). In order to do so, it requires the
 information gathered by the {!Theory.Trans} module.*)
 let print rlt ir m (context : EConstr.rel_context) : unit Proofview.tactic =

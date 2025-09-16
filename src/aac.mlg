@@ -8,13 +8,13 @@
 
 (** aac -- Reasoning modulo associativity and commutativity *)
 
-DECLARE PLUGIN "coq-aac-tactics.plugin"
+DECLARE PLUGIN "rocq-aac-tactics.plugin"
 
 {
 
 open Ltac_plugin
-open Pcoq.Prim
-open Pcoq.Constr
+open Procq.Prim
+open Procq.Constr
 open Stdarg
 open Aac_rewrite
 open Extraargs

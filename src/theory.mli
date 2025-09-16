@@ -6,26 +6,26 @@
 (*       Copyright 2009-2010: Thomas Braibant, Damien Pous.                *)
 (***************************************************************************)
 
-(** Bindings for Coq constants that are specific to the plugin;
+(** Bindings for Rocq constants that are specific to the plugin;
     reification and translation functions.
    
     Note: this module is highly correlated with the definitions of {i
     AAC_rewrite.v}.
 
-    This module interfaces with the above Coq module; it provides
+    This module interfaces with the above Rocq module; it provides
     facilities to interpret a term with arbitrary operators as an
-    abstract syntax tree, and to convert an AST into a Coq term
-    (either using the Coq "raw" terms, as written in the starting
-    goal, or using the reified Coq datatypes we define in {i
+    abstract syntax tree, and to convert an AST into a Rocq term
+    (either using the Rocq "raw" terms, as written in the starting
+    goal, or using the reified Rocq datatypes we define in {i
     AAC_rewrite.v}).
  *)
-open Coq
+open Rocq
 
-(** Both in OCaml and Coq, we represent finite multisets using
+(** Both in OCaml and Rocq, we represent finite multisets using
     weighted lists ([('a*int) list]), see {!Matcher.mset}.
 
-    [mk_mset ty l] constructs a Coq multiset from an OCaml multiset
-    [l] of Coq terms of type [ty] *)
+    [mk_mset ty l] constructs a Rocq multiset from an OCaml multiset
+    [l] of Rocq terms of type [ty] *)
 
 val mk_mset:EConstr.constr -> (EConstr.constr * int) list ->EConstr.constr
 
@@ -40,10 +40,10 @@ sig
   (** [empty ty] create an empty map of type [ty]  *)
   val empty: EConstr.constr ->EConstr.constr
 
-  (** [of_list ty null l] translates an OCaml association list into a Coq one *)
+  (** [of_list ty null l] translates an OCaml association list into a Rocq one *)
   val of_list: EConstr.constr -> EConstr.constr -> (int * EConstr.constr ) list -> EConstr.constr
 
-  (** [to_fun ty null map] converts a Coq association list into a Coq function (with default value [null]) *)
+  (** [to_fun ty null map] converts a Rocq association list into a Rocq function (with default value [null]) *)
   val to_fun: EConstr.constr ->EConstr.constr ->EConstr.constr ->EConstr.constr
 end
 
@@ -51,22 +51,22 @@ end
 (** Dynamically typed morphisms *)
 module Sym:
 sig
-  (** mimics the Coq record [Sym.pack] *)
+  (** mimics the Rocq record [Sym.pack] *)
   type pack = {ar: Constr.t; value: Constr.t ; morph: Constr.t}
 
   val typ: lazy_ref
 
 
   (** [mk_pack rlt (ar,value,morph)]  *)
-  val mk_pack: Coq.Relation.t -> pack -> EConstr.constr
+  val mk_pack: Rocq.Relation.t -> pack -> EConstr.constr
    
-  (** [null] builds a dummy (identity) symbol, given an {!Coq.Relation.t} *)
-  val null: Coq.Relation.t -> EConstr.constr
+  (** [null] builds a dummy (identity) symbol, given an {!Rocq.Relation.t} *)
+  val null: Rocq.Relation.t -> EConstr.constr
  
 end
 
 
-(** We need to export some Coq stubs out of this module. They are used
+(** We need to export some Rocq stubs out of this module. They are used
     by the main tactic, see {!Rewrite} *)
 module Stubs : sig
   val lift : lazy_ref
@@ -75,8 +75,8 @@ module Stubs : sig
   val lift_transitivity_right : lazy_ref
   val lift_reflexivity : lazy_ref
 
-    (** The evaluation fonction, used to convert a reified coq term to a
-	raw coq term *)
+    (** The evaluation fonction, used to convert a reified Rocq term to a
+	raw Rocq term *)
   val eval: lazy_ref
 
   (** The main lemma of our theory, that is
@@ -93,14 +93,14 @@ end
     procedure). In particular, each field takes as first argument the
     index of the symbol rather than the symbol itself. *)
  
-(** Tranlations between Coq and OCaml  *)
+(** Tranlations between Rocq and OCaml  *)
 module Trans :  sig
 
   (** This module provides facilities to interpret a term with
       arbitrary operators as an instance of an abstract syntax tree
       {!Matcher.Terms.t}.
 
-      For each Coq application [f x_1 ... x_n], this amounts to
+      For each Rocq application [f x_1 ... x_n], this amounts to
       deciding whether one of the partial applications [f x_1
       ... x_i], [i<=n] is a proper morphism, whether the partial
       application with [i=n-2] yields an A or AC binary operator, and
@@ -127,7 +127,7 @@ module Trans :  sig
   val empty_envs : unit -> envs
    
 
-  (** {2 Reification: from Coq terms to AST {!Matcher.Terms.t}  } *)
+  (** {2 Reification: from Rocq terms to AST {!Matcher.Terms.t}  } *)
 
 
   (** [t_of_constr goal rlt envs (left,right)] builds the abstract
@@ -138,22 +138,22 @@ module Trans :  sig
       evars; this is why we give back the [goal], accordingly
       updated. *)
   
-  val t_of_constr : Environ.env -> Evd.evar_map -> Coq.Relation.t -> envs -> (EConstr.constr * EConstr.constr) -> Matcher.Terms.t * Matcher.Terms.t * Evd.evar_map
+  val t_of_constr : Environ.env -> Evd.evar_map -> Rocq.Relation.t -> envs -> (EConstr.constr * EConstr.constr) -> Matcher.Terms.t * Matcher.Terms.t * Evd.evar_map
 
   (** [add_symbol] adds a given binary symbol to the environment of
       known stuff. *)
-  val add_symbol : Environ.env -> Evd.evar_map -> Coq.Relation.t -> envs -> Constr.t -> Evd.evar_map
+  val add_symbol : Environ.env -> Evd.evar_map -> Rocq.Relation.t -> envs -> Constr.t -> Evd.evar_map
 
-  (** {2 Reconstruction: from AST back to Coq terms  }
+  (** {2 Reconstruction: from AST back to Rocq terms  }
      
       The next functions allow one to map OCaml abstract syntax trees
-      to Coq terms. We need two functions to rebuild different kind of
+      to Rocq terms. We need two functions to rebuild different kind of
       terms: first, raw terms, like the one encountered by
-      {!t_of_constr}; second, reified Coq terms, that are required for
+      {!t_of_constr}; second, reified Rocq terms, that are required for
       the reflexive decision procedure. *)
 
   type ir
-  val ir_of_envs : Environ.env -> Evd.evar_map -> Coq.Relation.t -> envs -> Evd.evar_map * ir
+  val ir_of_envs : Environ.env -> Evd.evar_map -> Rocq.Relation.t -> envs -> Evd.evar_map * ir
   val ir_to_units : ir -> Matcher.ext_units
 
   (** {2 Building raw, natural, terms} *)
@@ -162,11 +162,11 @@ module Trans :  sig
       reconstruct the named products on top of it. In particular, this
       allow us to print the context put around the left (or right)
       hand side of a pattern. *)
-  val raw_constr_of_t : ir ->  Coq.Relation.t -> EConstr.rel_context -> Matcher.Terms.t -> EConstr.constr
+  val raw_constr_of_t : ir ->  Rocq.Relation.t -> EConstr.rel_context -> Matcher.Terms.t -> EConstr.constr
 
   (** {2 Building reified terms} *)
 
-  (** The reification environments, as Coq constrs *)
+  (** The reification environments, as Rocq constrs *)
 
   type sigmas = {
     env_sym : EConstr.constr;
@@ -190,7 +190,7 @@ module Trans :  sig
       reify each term successively.*)
   type reifier
 
-  val mk_reifier : Coq.Relation.t -> EConstr.constr -> ir -> (sigmas * reifier) Proofview.tactic
+  val mk_reifier : Rocq.Relation.t -> EConstr.constr -> ir -> (sigmas * reifier) Proofview.tactic
 
   (** [reif_constr_of_t  reifier t] rebuilds the term [t] in the
       reified form. *)

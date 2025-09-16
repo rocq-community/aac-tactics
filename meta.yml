@@ -1,7 +1,7 @@
 ---
 fullname: AAC Tactics
 shortname: aac-tactics
-organization: coq-community
+organization: rocq-community
 community: true
 action: true
 nix: true
@@ -12,11 +12,11 @@ coqdoc: true
 coqdoc_index: docs/coqdoc/toc.html
 
 synopsis: >-
-  Coq tactics for rewriting universally quantified equations, modulo
+  Rocq tactics for rewriting universally quantified equations, modulo
   associative (and possibly commutative and idempotent) operators
 
 description: |-
-  This Coq plugin provides tactics for rewriting and proving universally
+  This Rocq plugin provides tactics for rewriting and proving universally
   quantified equations modulo associativity and commutativity of some operator,
   with idempotent commutative operators enabling additional simplifications.
   The tactics can be applied for custom operators by registering the operators and
@@ -73,7 +73,7 @@ keywords:
 - name: decision procedure
 
 categories:
-- name: Miscellaneous/Coq Extensions
+- name: Miscellaneous/Rocq Extensions
 - name: Computer Science/Decision Procedures and Certified Algorithms/Decision procedures
 
 documentation: |
@@ -83,7 +83,7 @@ documentation: |
   ```coq
   From AAC_tactics Require Import AAC.
   From AAC_tactics Require Instances.
-  From Coq Require Import ZArith.
+  From Stdlib Require Import ZArith.
 
   Section ZOpp.
     Import Instances.Z.
