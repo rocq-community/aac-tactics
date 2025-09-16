@@ -1,6 +1,8 @@
 (library
  (name aac_plugin)
  (public_name rocq-aac-tactics.plugin)
- (flags :standard -w -3-27-32-67))
+ (flags :standard -w -3-27-32-67)
+ (libraries rocq-runtime.plugins.ltac))
 
-(rocq.pp (modules aac))
+;; DP: don't know how to update this 
+; (coq.pp (modules aac))

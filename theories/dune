@@ -1,6 +1,6 @@
-(coq.theory
+(rocq.theory
  (name AAC_tactics)
  (package rocq-aac-tactics)
  (synopsis "Rocq plugin providing tactics for rewriting universally quantified equations, modulo associative (and possibly commutative) operators")
- (libraries rocq-aac-tactics.plugin)
+ (plugins rocq-aac-tactics.plugin)
  (flags :standard -w +default))
