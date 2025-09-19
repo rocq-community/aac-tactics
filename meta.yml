@@ -49,7 +49,7 @@ license:
   identifier: LGPL-3.0-or-later
 
 supported_coq_versions:
-  text: master (use the corresponding branch or release for other Coq versions)
+  text: master (use the corresponding branch or release for other Rocq versions)
   opam: '{= "dev"}'
 
 supported_ocaml_versions:

@@ -4,5 +4,4 @@
  (flags :standard -w -3-27-32-67)
  (libraries rocq-runtime.plugins.ltac))
 
-;; DP: don't know how to update this 
-; (coq.pp (modules aac))
+(coq.pp (modules aac))

@@ -1,6 +1,12 @@
-(rocq.theory
+(coq.theory
  (name AAC_tactics)
  (package rocq-aac-tactics)
  (synopsis "Rocq plugin providing tactics for rewriting universally quantified equations, modulo associative (and possibly commutative) operators")
  (plugins rocq-aac-tactics.plugin)
  (flags :standard -w +default))
+
+; DP:
+; it seems dune does not bind stdlib modules correctly
+; I need to add flag "-R [...]/coq/user-contrib/Stdlib Stdlib"
+; in order [dune build] to work
+
