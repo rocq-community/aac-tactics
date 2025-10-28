@@ -8,8 +8,6 @@ nix: true
 plugin: true
 doi: 10.1007/978-3-642-25379-9_14
 branch: master
-coqdoc: true
-coqdoc_index: docs/coqdoc/toc.html
 
 synopsis: >-
   Rocq tactics for rewriting universally quantified equations, modulo
@@ -26,7 +24,7 @@ description: |-
 publications:
 - pub_doi: 10.1007/978-3-642-25379-9_14
   pub_url: https://arxiv.org/abs/1106.4448
-  pub_title: Tactics for Reasoning modulo AC in Rocq
+  pub_title: Tactics for Reasoning modulo AC in Coq
 
 authors:
 - name: Thomas Braibant
@@ -48,7 +46,7 @@ license:
   fullname: GNU Lesser General Public License v3.0 or later
   identifier: LGPL-3.0-or-later
 
-supported_coq_versions:
+supported_rocq_versions:
   text: master (use the corresponding branch or release for other Rocq versions)
   opam: '{= "dev"}'
 
@@ -56,12 +54,13 @@ supported_ocaml_versions:
     text: 4.09.0 or later
     opam: '{>= "4.09.0"}'
 
-tested_coq_nix_versions:
-- coq_version: 'master'
-
-tested_coq_opam_versions:
+tested_rocq_opam_versions:
 - version: dev
   repo: 'rocq/rocq-prover'
+
+dependencies:
+- opam:
+    name: rocq-stdlib
 
 namespace: AAC_tactics
 
@@ -123,11 +122,6 @@ documentation: |
   
   To understand the inner workings of the tactics, please refer to
   the `.mli` files as the main source of information on each `.ml` file.
-
-  See also the [latest coqdoc
-  documentation](https://coq-community.org/aac-tactics/docs/coqdoc/toc.html)
-  and the [latest ocamldoc
-  documentation](https://coq-community.org/aac-tactics/docs/ocamldoc/index.html).
   
   ## Acknowledgements
 

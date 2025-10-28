@@ -1,8 +1,0 @@
-OCAMLDOCDIR = docs/ocamldoc
-
-ocamldoc: $(MLIFILES)
-	$(SHOW)'OCAMLDOC -d $(OCAMLDOCDIR)'
-	$(HIDE)mkdir -p $(OCAMLDOCDIR)
-	$(HIDE)$(CAMLDOC) -d $(OCAMLDOCDIR) -html \
-         -m A $(CAMLDEBUG) $(CAMLDOCFLAGS) $(MLIFILES) $(FINDLIBPKGS)
-.PHONY: ocamldoc
