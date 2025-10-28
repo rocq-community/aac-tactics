@@ -1,16 +1,16 @@
--generate-meta-for-package coq-aac-tactics
+-generate-meta-for-package rocq-aac-tactics
 -Q theories AAC_tactics
 -Q src AAC_tactics
 -I src
 
-src/coq.mli
+src/rocq.mli
 src/helper.mli
 src/search_monad.mli
 src/matcher.mli
 src/theory.mli
 src/print.mli
 src/aac_rewrite.mli
-src/coq.ml
+src/rocq.ml
 src/helper.ml
 src/search_monad.ml
 src/matcher.ml

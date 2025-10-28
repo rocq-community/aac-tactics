@@ -1,4 +1,4 @@
-From Coq Require Import ZArith.
+From Stdlib Require Import ZArith.
 From AAC_tactics Require Import AAC.
 
 Goal forall X:Prop, X->X.

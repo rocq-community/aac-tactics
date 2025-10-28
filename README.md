@@ -9,14 +9,13 @@ Follow the instructions on https://github.com/coq-community/templates to regener
 [![Contributing][contributing-shield]][contributing-link]
 [![Code of Conduct][conduct-shield]][conduct-link]
 [![Zulip][zulip-shield]][zulip-link]
-[![coqdoc][coqdoc-shield]][coqdoc-link]
 [![DOI][doi-shield]][doi-link]
 
-[docker-action-shield]: https://github.com/coq-community/aac-tactics/actions/workflows/docker-action.yml/badge.svg?branch=master
-[docker-action-link]: https://github.com/coq-community/aac-tactics/actions/workflows/docker-action.yml
+[docker-action-shield]: https://github.com/rocq-community/aac-tactics/actions/workflows/docker-action.yml/badge.svg?branch=master
+[docker-action-link]: https://github.com/rocq-community/aac-tactics/actions/workflows/docker-action.yml
 
-[nix-action-shield]: https://github.com/coq-community/aac-tactics/actions/workflows/nix-action.yml/badge.svg?branch=master
-[nix-action-link]: https://github.com/coq-community/aac-tactics/actions/workflows/nix-action.yml
+[nix-action-shield]: https://github.com/rocq-community/aac-tactics/actions/workflows/nix-action.yml/badge.svg?branch=master
+[nix-action-link]: https://github.com/rocq-community/aac-tactics/actions/workflows/nix-action.yml
 
 [contributing-shield]: https://img.shields.io/badge/contributions-welcome-%23f7931e.svg
 [contributing-link]: https://github.com/coq-community/manifesto/blob/master/CONTRIBUTING.md
@@ -27,13 +26,11 @@ Follow the instructions on https://github.com/coq-community/templates to regener
 [zulip-shield]: https://img.shields.io/badge/chat-on%20zulip-%23c1272d.svg
 [zulip-link]: https://coq.zulipchat.com/#narrow/stream/237663-coq-community-devs.20.26.20users
 
-[coqdoc-shield]: https://img.shields.io/badge/docs-coqdoc-blue.svg
-[coqdoc-link]: https://coq-community.org/aac-tactics/docs/coqdoc/toc.html
 
 [doi-shield]: https://zenodo.org/badge/DOI/10.1007/978-3-642-25379-9_14.svg
 [doi-link]: https://doi.org/10.1007/978-3-642-25379-9_14
 
-This Coq plugin provides tactics for rewriting and proving universally
+This Rocq plugin provides tactics for rewriting and proving universally
 quantified equations modulo associativity and commutativity of some operator,
 with idempotent commutative operators enabling additional simplifications.
 The tactics can be applied for custom operators by registering the operators and
@@ -46,13 +43,18 @@ such as for binary integer arithmetic and booleans, are provided with the plugin
   - Thomas Braibant (initial)
   - Damien Pous (initial)
   - Fabian Kunze
-- Coq-community maintainer(s):
+- Rocq-community maintainer(s):
   - Karl Palmskog ([**@palmskog**](https://github.com/palmskog))
 - License: [GNU Lesser General Public License v3.0 or later](LICENSE)
-- Compatible Coq versions: master (use the corresponding branch or release for other Coq versions)
 - Compatible OCaml versions: 4.09.0 or later
-- Additional dependencies: none
-- Coq namespace: `AAC_tactics`
+- Additional dependencies:
+  - This Rocq plugin provides tactics for rewriting and proving universally
+quantified equations modulo associativity and commutativity of some operator,
+with idempotent commutative operators enabling additional simplifications.
+The tactics can be applied for custom operators by registering the operators and
+their properties as type class instances. Instances for many commonly used operators,
+such as for binary integer arithmetic and booleans, are provided with the plugin.
+- Rocq/Coq namespace: `AAC_tactics`
 - Related publication(s):
   - [Tactics for Reasoning modulo AC in Coq](https://arxiv.org/abs/1106.4448) doi:[10.1007/978-3-642-25379-9_14](https://doi.org/10.1007/978-3-642-25379-9_14)
 
@@ -69,7 +71,7 @@ opam install coq-aac-tactics
 To instead build and install manually, do:
 
 ``` shell
-git clone https://github.com/coq-community/aac-tactics.git
+git clone https://github.com/rocq-community/aac-tactics.git
 cd aac-tactics
 make   # or make -j <number-of-cores-on-your-machine> 
 make install
@@ -82,7 +84,7 @@ The following example shows an application of the tactics for reasoning over Z b
 ```coq
 From AAC_tactics Require Import AAC.
 From AAC_tactics Require Instances.
-From Coq Require Import ZArith.
+From Stdlib Require Import ZArith.
 
 Section ZOpp.
   Import Instances.Z.
@@ -122,11 +124,6 @@ Namely, it contains instances for:
 
 To understand the inner workings of the tactics, please refer to
 the `.mli` files as the main source of information on each `.ml` file.
-
-See also the [latest coqdoc
-documentation](https://coq-community.org/aac-tactics/docs/coqdoc/toc.html)
-and the [latest ocamldoc
-documentation](https://coq-community.org/aac-tactics/docs/ocamldoc/index.html).
 
 ## Acknowledgements
 

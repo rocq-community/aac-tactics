@@ -1,22 +1,20 @@
 ---
 fullname: AAC Tactics
 shortname: aac-tactics
-organization: coq-community
+organization: rocq-community
 community: true
 action: true
 nix: true
 plugin: true
 doi: 10.1007/978-3-642-25379-9_14
 branch: master
-coqdoc: true
-coqdoc_index: docs/coqdoc/toc.html
 
 synopsis: >-
-  Coq tactics for rewriting universally quantified equations, modulo
+  Rocq tactics for rewriting universally quantified equations, modulo
   associative (and possibly commutative and idempotent) operators
 
 description: |-
-  This Coq plugin provides tactics for rewriting and proving universally
+  This Rocq plugin provides tactics for rewriting and proving universally
   quantified equations modulo associativity and commutativity of some operator,
   with idempotent commutative operators enabling additional simplifications.
   The tactics can be applied for custom operators by registering the operators and
@@ -48,20 +46,21 @@ license:
   fullname: GNU Lesser General Public License v3.0 or later
   identifier: LGPL-3.0-or-later
 
-supported_coq_versions:
-  text: master (use the corresponding branch or release for other Coq versions)
+supported_rocq_versions:
+  text: master (use the corresponding branch or release for other Rocq versions)
   opam: '{= "dev"}'
 
 supported_ocaml_versions:
     text: 4.09.0 or later
     opam: '{>= "4.09.0"}'
 
-tested_coq_nix_versions:
-- coq_version: 'master'
-
-tested_coq_opam_versions:
+tested_rocq_opam_versions:
 - version: dev
   repo: 'rocq/rocq-prover'
+
+dependencies:
+- opam:
+    name: rocq-stdlib
 
 namespace: AAC_tactics
 
@@ -73,7 +72,7 @@ keywords:
 - name: decision procedure
 
 categories:
-- name: Miscellaneous/Coq Extensions
+- name: Miscellaneous/Rocq Extensions
 - name: Computer Science/Decision Procedures and Certified Algorithms/Decision procedures
 
 documentation: |
@@ -83,7 +82,7 @@ documentation: |
   ```coq
   From AAC_tactics Require Import AAC.
   From AAC_tactics Require Instances.
-  From Coq Require Import ZArith.
+  From Stdlib Require Import ZArith.
 
   Section ZOpp.
     Import Instances.Z.
@@ -123,11 +122,6 @@ documentation: |
   
   To understand the inner workings of the tactics, please refer to
   the `.mli` files as the main source of information on each `.ml` file.
-
-  See also the [latest coqdoc
-  documentation](https://coq-community.org/aac-tactics/docs/coqdoc/toc.html)
-  and the [latest ocamldoc
-  documentation](https://coq-community.org/aac-tactics/docs/ocamldoc/index.html).
   
   ## Acknowledgements
 

@@ -10,7 +10,7 @@
     associativity and associativity and commutativity
     (AAC). Additionnaly, some A or AC operators can have units (U).
 
-    This module could be reused outside of the Coq plugin.
+    This module could be reused outside of the Rocq plugin.
 
     Matching a pattern [p] against a term [t] modulo AACU boils down
     to finding a substitution [env] such that the pattern [p]

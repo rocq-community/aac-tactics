@@ -6,7 +6,7 @@
 (*       Copyright 2009-2010: Thomas Braibant, Damien Pous.                *)
 (***************************************************************************)
 
-(** Interface with Coq *)
+(** Interface with Rocq *)
 
 open Constr
 open EConstr
@@ -25,7 +25,7 @@ type lazy_ref = Names.GlobRef.t Lazy.t
 
 (* The contrib name is used to locate errors when loading constrs *)
 let contrib_name = "aac_tactics"
-let aac_lib_ref s = Coqlib.lib_ref (contrib_name ^ "." ^ s)
+let aac_lib_ref s = Rocqlib.lib_ref (contrib_name ^ "." ^ s)
 let find_global s = lazy (aac_lib_ref s)
                   
 
@@ -34,7 +34,7 @@ let new_monomorphic_global gr =
   with _e ->
     CErrors.anomaly Pp.(str "new_monomorphic_global raised an error on:" ++ Printer.pr_global gr)
        
-(* Getting constrs (primitive Coq terms) from existing Coq
+(* Getting constrs (primitive Rocq terms) from existing Rocq
    libraries. *)
 let get_fresh r = new_monomorphic_global (Lazy.force r)
 let get_efresh r = EConstr.of_constr (new_monomorphic_global (Lazy.force r))
@@ -94,7 +94,7 @@ let mk_letin (name:string) (c: constr) : constr Proofview.tactic =
 (** {1 General functions}  *)
 
 let resolve_one_typeclass env sigma ty : constr * Evd.evar_map =
-  let sigma, c = Typeclasses.resolve_one_typeclass env sigma ty in
+  let sigma, c = Class_tactics.resolve_one_typeclass env sigma ty in
   c, sigma
 
 let cps_resolve_one_typeclass ?error : types -> (constr -> tactic) -> tactic = fun t k ->
@@ -102,7 +102,7 @@ let cps_resolve_one_typeclass ?error : types -> (constr -> tactic) -> tactic = f
   let env = Proofview.Goal.env gl in
   let em = Proofview.Goal.sigma gl in
   let em, c =
-  try Typeclasses.resolve_one_typeclass env em t
+  try Class_tactics.resolve_one_typeclass env em t
   with Not_found ->
     begin match error with
       | None -> CErrors.anomaly (Pp.str "Cannot resolve a typeclass : please report")
@@ -124,7 +124,7 @@ let evar_relation env (sigma: Evd.evar_map) (x: constr) =
 
 let decomp_term sigma c = kind sigma (Termops.strip_outer_cast sigma c)
    
-(** {2 Bindings with Coq' Standard Library}  *)
+(** {2 Bindings with Rocq' Standard Library}  *)
 module Std = struct  		
 (* Here we package the module to be able to use List, later *)
 
@@ -154,7 +154,7 @@ module Pos = struct
     let xO =  find_global "pos.xO"
     let xH =  find_global "pos.xH"
 
-    (* A coq positive from an int *)
+    (* A Rocq positive from an int *)
     let of_int n =
       let rec aux n =
 	begin  match n with
@@ -176,7 +176,7 @@ module Nat = struct
   let typ = find_global "nat.type"
   let _S = find_global "nat.S"
   let _O = find_global "nat.O"
-    (* A coq nat from an int *)
+    (* A Rocq nat from an int *)
   let rec of_int n =
     begin  match n with
     | n when n < 0 -> assert false
@@ -208,10 +208,10 @@ end
 (** Morphisms *)
 module Classes =
 struct
-  let morphism = find_global "coq.classes.morphisms.Proper"
-  let equivalence = find_global "coq.RelationClasses.Equivalence"
-  let reflexive = find_global "coq.RelationClasses.Reflexive"
-  let transitive = find_global "coq.RelationClasses.Transitive"
+  let morphism = find_global "rocq.classes.morphisms.Proper"
+  let equivalence = find_global "rocq.RelationClasses.Equivalence"
+  let reflexive = find_global "rocq.RelationClasses.Reflexive"
+  let transitive = find_global "rocq.RelationClasses.Transitive"
 
   (** build the type [Equivalence ty rel]  *)
   let mk_equivalence ty rel =

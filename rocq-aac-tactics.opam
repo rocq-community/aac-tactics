@@ -1,33 +1,31 @@
-# This file was generated from `meta.yml`, please do not edit manually.
-# Follow the instructions on https://github.com/coq-community/templates to regenerate.
-
 opam-version: "2.0"
 maintainer: "palmskog@gmail.com"
 version: "dev"
 
-homepage: "https://github.com/coq-community/aac-tactics"
-dev-repo: "git+https://github.com/coq-community/aac-tactics.git"
-bug-reports: "https://github.com/coq-community/aac-tactics/issues"
+homepage: "https://github.com/rocq-community/aac-tactics"
+dev-repo: "git+https://github.com/rocq-community/aac-tactics.git"
+bug-reports: "https://github.com/rocq-community/aac-tactics/issues"
 license: "LGPL-3.0-or-later"
 
-synopsis: "Coq tactics for rewriting universally quantified equations, modulo associative (and possibly commutative and idempotent) operators"
+synopsis: "Rocq tactics for rewriting universally quantified equations, modulo associative (and possibly commutative and idempotent) operators"
 description: """
-This Coq plugin provides tactics for rewriting and proving universally
+This Rocq plugin provides tactics for rewriting and proving universally
 quantified equations modulo associativity and commutativity of some operator,
 with idempotent commutative operators enabling additional simplifications.
 The tactics can be applied for custom operators by registering the operators and
 their properties as type class instances. Instances for many commonly used operators,
 such as for binary integer arithmetic and booleans, are provided with the plugin."""
 
-build: ["dune" "build" "-p" name "-j" jobs]
+build: [make "-j%{jobs}%"]
+install: [make "install"]
 depends: [
   "ocaml" {>= "4.09.0"}
-  "dune" {>= "3.5"}
-  "coq" {= "dev"}
+  "rocq-core" {= "dev"}
+  "rocq-stdlib" 
 ]
 
 tags: [
-  "category:Miscellaneous/Coq Extensions"
+  "category:Miscellaneous/Rocq Extensions"
   "category:Computer Science/Decision Procedures and Certified Algorithms/Decision procedures"
   "keyword:reflexive tactic"
   "keyword:rewriting"
