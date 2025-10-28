@@ -24,5 +24,3 @@ src/aac.ml
 .merlin
 RocqMakefile*
 META.rocq-aac-tactics
-_build
-docs/
