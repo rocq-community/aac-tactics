@@ -7,10 +7,10 @@
 [![Zulip][zulip-shield]][zulip-link]
 [![DOI][doi-shield]][doi-link]
 
-[docker-action-shield]: https://github.com/rocq-community/aac-tactics/actions/workflows/docker-action.yml/badge.svg?branch=master
+[docker-action-shield]: https://github.com/rocq-community/aac-tactics/actions/workflows/docker-action.yml/badge.svg?branch=v9.0
 [docker-action-link]: https://github.com/rocq-community/aac-tactics/actions/workflows/docker-action.yml
 
-[nix-action-shield]: https://github.com/rocq-community/aac-tactics/actions/workflows/nix-action.yml/badge.svg?branch=master
+[nix-action-shield]: https://github.com/rocq-community/aac-tactics/actions/workflows/nix-action.yml/badge.svg?branch=v9.0
 [nix-action-link]: https://github.com/rocq-community/aac-tactics/actions/workflows/nix-action.yml
 
 [contributing-shield]: https://img.shields.io/badge/contributions-welcome-%23f7931e.svg
@@ -42,6 +42,7 @@ such as for binary integer arithmetic and booleans, are provided with the plugin
 - Rocq-community maintainer(s):
   - Karl Palmskog ([**@palmskog**](https://github.com/palmskog))
 - License: [GNU Lesser General Public License v3.0 or later](LICENSE)
+- Compatible Rocq versions: 9.0
 - Compatible OCaml versions: 4.09.0 or later
 - Additional dependencies:
   - Rocq's standard library

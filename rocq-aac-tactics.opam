@@ -1,6 +1,6 @@
 opam-version: "2.0"
 maintainer: "palmskog@gmail.com"
-version: "dev"
+version: "9.0.dev"
 
 homepage: "https://github.com/rocq-community/aac-tactics"
 dev-repo: "git+https://github.com/rocq-community/aac-tactics.git"
@@ -20,7 +20,7 @@ build: [make "-j%{jobs}%"]
 install: [make "install"]
 depends: [
   "ocaml" {>= "4.09.0"}
-  "rocq-core" {= "dev"}
+  "rocq-core" {>= "9.0" & < "9.1"}
   "rocq-stdlib" 
 ]
 
