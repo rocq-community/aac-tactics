@@ -1,7 +1,3 @@
-<!---
-This file was generated from `meta.yml`, please do not edit manually.
-Follow the instructions on https://github.com/coq-community/templates to regenerate.
---->
 # AAC Tactics
 
 [![Docker CI][docker-action-shield]][docker-action-link]
@@ -18,13 +14,13 @@ Follow the instructions on https://github.com/coq-community/templates to regener
 [nix-action-link]: https://github.com/rocq-community/aac-tactics/actions/workflows/nix-action.yml
 
 [contributing-shield]: https://img.shields.io/badge/contributions-welcome-%23f7931e.svg
-[contributing-link]: https://github.com/coq-community/manifesto/blob/master/CONTRIBUTING.md
+[contributing-link]: https://github.com/rocq-community/manifesto/blob/master/CONTRIBUTING.md
 
 [conduct-shield]: https://img.shields.io/badge/%E2%9D%A4-code%20of%20conduct-%23f15a24.svg
-[conduct-link]: https://github.com/coq-community/manifesto/blob/master/CODE_OF_CONDUCT.md
+[conduct-link]: https://github.com/rocq-community/manifesto/blob/master/CODE_OF_CONDUCT.md
 
 [zulip-shield]: https://img.shields.io/badge/chat-on%20zulip-%23c1272d.svg
-[zulip-link]: https://coq.zulipchat.com/#narrow/stream/237663-coq-community-devs.20.26.20users
+[zulip-link]: https://rocq.zulipchat.com/#narrow/stream/237663-rocq-community-devs.20.26.20users
 
 
 [doi-shield]: https://zenodo.org/badge/DOI/10.1007/978-3-642-25379-9_14.svg
@@ -48,24 +44,19 @@ such as for binary integer arithmetic and booleans, are provided with the plugin
 - License: [GNU Lesser General Public License v3.0 or later](LICENSE)
 - Compatible OCaml versions: 4.09.0 or later
 - Additional dependencies:
-  - This Rocq plugin provides tactics for rewriting and proving universally
-quantified equations modulo associativity and commutativity of some operator,
-with idempotent commutative operators enabling additional simplifications.
-The tactics can be applied for custom operators by registering the operators and
-their properties as type class instances. Instances for many commonly used operators,
-such as for binary integer arithmetic and booleans, are provided with the plugin.
-- Rocq/Coq namespace: `AAC_tactics`
+  - Rocq's standard library
+- Rocq namespace: `AAC_tactics`
 - Related publication(s):
   - [Tactics for Reasoning modulo AC in Coq](https://arxiv.org/abs/1106.4448) doi:[10.1007/978-3-642-25379-9_14](https://doi.org/10.1007/978-3-642-25379-9_14)
 
 ## Building and installation instructions
 
 The easiest way to install the latest released version of AAC Tactics
-is via [OPAM](https://opam.ocaml.org/doc/Install.html):
+is via [opam](https://opam.ocaml.org/doc/Install.html):
 
 ```shell
-opam repo add coq-released https://coq.inria.fr/opam/released
-opam install coq-aac-tactics
+opam repo add rocq-released https://rocq-prover.org/opam/released
+opam install rocq-aac-tactics
 ```
 
 To instead build and install manually, do:

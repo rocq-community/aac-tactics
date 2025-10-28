@@ -61,6 +61,8 @@ tested_rocq_opam_versions:
 dependencies:
 - opam:
     name: rocq-stdlib
+  description: |-
+    Rocq's standard library
 
 namespace: AAC_tactics
 
