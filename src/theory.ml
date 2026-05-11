@@ -23,11 +23,25 @@ end
 module Debug = Helper.Debug (Control)
 open Debug
 
+let rec normalize_constr env c = match Constr.kind c with
+| Const (cst, u) -> Constr.mkConstU (Environ.QConstant.canonize env cst, u)
+| Ind (ind, u) -> Constr.mkIndU (Environ.QInd.canonize env ind, u)
+| Construct (cstr, u) -> Constr.mkConstructU (Environ.QConstruct.canonize env cstr, u)
+| _ -> Constr.map (fun c -> normalize_constr env c) c
+
 (** {1 HMap :     Specialized Hashtables based on constr} *)
 
 
   (* TODO module HMap = Hashtbl, du coup ? *)
-module HMap = Hashtbl.Make(Termops.ConstrData)
+module HMap =
+struct
+  module Internal = Hashtbl.Make(Termops.ConstrData)
+  type 'a t = 'a Internal.t
+  let create = Internal.create
+  let add env htbl k v = Internal.add htbl (normalize_constr env k) v
+  let find env htbl k = Internal.find htbl (normalize_constr env k)
+  let fold = Internal.fold
+end
 
 module Stubs = struct
 
@@ -432,15 +446,15 @@ module Trans = struct
   end
     = struct
 
-      let memoize envs t pack : unit =
+      let memoize env envs t pack : unit =
 	begin
-	  HMap.add envs.discr t (Some pack);
+	  HMap.add env envs.discr t (Some pack);
 	  add_bloom envs pack;
 	  match pack with
 	    | Bin (_, None) | Sym _ -> ()
 	    | Bin (_, Some (unit_of)) ->
 	      let unit = unit_of.Unit.uf_u in
-	      HMap.add envs.discr unit (Some (Unit unit));
+	      HMap.add env envs.discr unit (Some (Unit unit));
 	      add_bloom envs (Unit unit);
 	    | Unit _ -> assert false
 	end
@@ -555,12 +569,12 @@ module Trans = struct
 	    match is_morphism env sigma rlt papp (nb_params - n) with
 	      | None ->
 		  (* here we have to memoize the failures *)
-		  HMap.add envs.discr (EConstr.to_constr sigma papp) None;
+		  HMap.add env envs.discr (EConstr.to_constr sigma papp) None;
 		  if n < nb_params - 1 then aux (n+1) else sigma
 	      | Some (sigma, pack) ->
 		  let args = Array.sub ca (n) (nb_params -n)in
 		  let sigma = Array.fold_left cont sigma args in
-		    memoize envs (EConstr.to_constr sigma papp) pack;
+		    memoize env envs (EConstr.to_constr sigma papp) pack;
 		    sigma
 	in
 	  if nb_params = 0 then sigma else aux 0
@@ -573,7 +587,7 @@ module Trans = struct
 	      begin match is_aac papp env sigma with
 		| None -> fold_morphism t ca
 		| Some (sigma, pack) ->
-		    memoize envs (EConstr.to_constr sigma papp) pack;
+		    memoize env envs (EConstr.to_constr sigma papp) pack;
 		    Array.fold_left cont sigma args
 	      end
 
@@ -637,7 +651,7 @@ module Trans = struct
 	    let p_app = mkApp (t, Array.sub ca 0 (nb_params - ar)) in
 	    begin
 	      try
-		begin match HMap.find envs.discr (EConstr.to_constr ~abort_on_undefined_evars:(false) sigma p_app) with
+		begin match HMap.find env envs.discr (EConstr.to_constr ~abort_on_undefined_evars:(false) sigma p_app) with
 		  | None ->
 		    fold sigma (ar-1)
 		  | Some pack ->
@@ -652,7 +666,7 @@ module Trans = struct
 	  assert (0 <= ar && ar <= nb_params);
 	  match x with
 	    | Some (sigma, pack) ->
-	      HMap.add envs.discr (EConstr.to_constr ~abort_on_undefined_evars:(false) sigma p_app) (Some pack);
+	      HMap.add env envs.discr (EConstr.to_constr ~abort_on_undefined_evars:(false) sigma p_app) (Some pack);
 	      add_bloom envs pack;
 	      (sigma, pack, p_app, Array.sub ca (nb_params-ar) ar)
 	    | None ->
@@ -660,13 +674,13 @@ module Trans = struct
 	      if ar = 0 then raise NotReflexive;
 	      begin
 		(* to memoise the failures *)
-		HMap.add envs.discr (EConstr.to_constr ~abort_on_undefined_evars:(false) sigma p_app) None;
+		HMap.add env envs.discr (EConstr.to_constr ~abort_on_undefined_evars:(false) sigma p_app) None;
 		(* will terminate, since [const] is capped, and it is
 		   easy to find an instance of a constant *)
 		fold sigma (ar-1)
 	      end
 	in
-	try match HMap.find envs.discr (EConstr.to_constr ~abort_on_undefined_evars:(false) sigma (mkApp (t,ca))) with
+	try match HMap.find env envs.discr (EConstr.to_constr ~abort_on_undefined_evars:(false) sigma (mkApp (t,ca))) with
 	  | None -> fold sigma (nb_params)
 	  | Some pack -> sigma, pack, (mkApp (t,ca)), [| |]
 	with Not_found -> fold sigma (nb_params)
