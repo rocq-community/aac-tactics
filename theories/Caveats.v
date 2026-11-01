@@ -49,6 +49,7 @@ Section parameters.
   Hypothesis Hf': forall n, Proper (R ==> R) (f n).
 
   Goal forall a b k, a + f k (b+a) + b == a+b.
+  Proof.
     intros.
     (** [aac_rewrite] does not instantiate [n] automatically *)
     Fail aac_rewrite Hf. 
@@ -63,6 +64,7 @@ Section parameters.
   Hypothesis Hg : Proper (R ==> R) g.
 
   Goal forall a b c, g a + g b + g c == g (a + b + c).
+  Proof.
     intros.
     Fail aac_rewrite H.
     do 2 aac_rewrite (H g). aac_reflexivity.
@@ -87,6 +89,7 @@ Section morphism.
    [@eq nat] to [@eq N], we cannot rewrite under [N_of_nat]
   *)
   Goal forall a b: nat, N_of_nat (a+b-(b+a)) = 0%N.
+  Proof.
     intros.
     Fail aac_rewrite Nat.sub_diag.
   Abort.
@@ -99,6 +102,7 @@ Section morphism.
   Hypothesis H : P 0.
 
   Goal forall a b, P (a + b - (b + a)).
+  Proof.
     intros a b.
     Fail aac_rewrite Nat.sub_diag.
     (** a solution is to introduce an evar to replace the part to be
@@ -111,6 +115,7 @@ Section morphism.
   Qed.
 
   Goal forall a b, a+b-(b+a) = 0 /\ b-b = 0.
+  Proof.
     intros.
     (** similarly, we need to bring equations to the toplevel before
       being able to rewrite *)
@@ -140,6 +145,7 @@ Section ineq.
   Hypothesis H : forall x, x+x <= x.
 
   Goal forall a b c, c + - (a + a) + b + b <= c.
+  Proof.
     intros.
     (** this fails because the first solution is not valid ([Z.opp] is not increasing) *)
     Fail aac_rewrite H.
@@ -168,11 +174,13 @@ Section Peano.
   Hypothesis H : forall x, x + S x = S (x+x).
 
   Goal 1 = 1.
+  Proof.
   (** OK (no multiplication around), [x] is instantiated with [O] *)
     aacu_rewrite H.
   Abort.
 
   Goal 1 * 1 = 1.
+  Proof.
   (** fails since 1 is seen as a unit, not the application of the
     morphism [S] to the constant [O] *)
     Fail aacu_rewrite H.
@@ -181,11 +189,13 @@ Section Peano.
   Hypothesis H': forall x, x + 1 = 1 + x.
 
   Goal forall a, a + S (0+0) = 1 + a.
+  Proof.
   (** OK (no multiplication around), [x] is instantiated with [a] *)
     intro. aac_rewrite H'.
   Abort.
 
   Goal forall a, a * a + S (0+0) = 1 + a * a.
+  Proof.
   (** fails: although [S (0+0)] is understood as the application of
     the morphism [S] to the constant [O], it is not recognised
     as the unit [S O] of multiplication *)
@@ -214,6 +224,7 @@ Section evars.
   Hypothesis idem: forall x, x + x = x.
 
   Goal P.
+  Proof.
     eapply H.
     (** this works: [x] is instantiated with an evar *)
     aac_rewrite idem.
@@ -225,6 +236,7 @@ Section evars.
   Hypothesis H': forall x, 3+x = x -> P.
 
   Goal P.
+  Proof.
     eapply H'.
     (** this fails since we do not instantiate evars *)
     Fail aac_rewrite idem.
@@ -251,6 +263,7 @@ Section U.
   Hypothesis dot_inv_left : forall x, f x*x  == x.
 
   Goal f 1 == 1.
+  Proof.
     aac_rewrite dot_inv_left. reflexivity.
   Qed.
 
@@ -261,6 +274,7 @@ Section U.
   Hypothesis dot_inv_right : forall x, x*f x  == x.
 
   Goal f 1 == 1.
+  Proof.
     Fail aac_rewrite dot_inv_right.
     aacu_rewrite dot_inv_right. reflexivity.
   Qed.
@@ -307,6 +321,7 @@ Section W.
   Hypothesis H: 0 = c.
 
   Goal  b*(a+a) <= b*(c+a+a+1).   
+  Proof.
     (** [aac_rewrite] finds a pattern modulo AC that matches a given
      hypothesis, and then makes a call to [setoid_rewrite]. This
      [setoid_rewrite] can unfortunately make several rewrites (in a
@@ -344,6 +359,7 @@ Section Z.
   Hypothesis H1: forall x, 1 = x * x.
 
   Goal a + b * c = c.
+  Proof.
     aac_instances H0.
     (** in this case, only three solutions are proposed, while there are
       infinitely many solutions, for example:
@@ -361,6 +377,7 @@ Section Z.
   *)
 
   Goal a+b+c = c.
+  Proof.
     aac_instances H0 [mult].            
     (** 1 solution, we miss solutions like [(a+b+c*(1+0*(1+[])))] and so on  *)    
     aac_instances H1 [mult].     
@@ -376,6 +393,7 @@ Section Z.
   Hypothesis H : forall x y, (x+y)*x = x*x + y*x.
 
   Goal a*a+b*a + c = c.
+  Proof.
     (** here, only one solution if we use the aac_instance tactic *)
     aac_instances <- H.
     (** there are 8 solutions using [aacu_instances] (but, here,

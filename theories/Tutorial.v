@@ -26,11 +26,13 @@ Section introduction.
   Hypothesis H: forall x, x + Z.opp x = 0.
 
   Goal a + b + c + Z.opp (c + a) = b.
+  Proof.
     aac_rewrite H.
     aac_reflexivity.
   Qed.
 
   Goal a + c + Z.opp (b + a + Z.opp b) = c.
+  Proof.
     do 2 aac_rewrite H.
     reflexivity.
   Qed.
@@ -46,6 +48,7 @@ Section introduction.
       here, [Z.mul] and [Z.add], which are both associative and commutative (AC)
   *)
   Goal (b + c) * (c + b) + a + Z.opp ((c + b) * (b + c)) = a.
+  Proof.
     aac_rewrite H.
     aac_reflexivity.
   Qed.
@@ -55,12 +58,14 @@ Section introduction.
       however, [aac_rewrite] does not match modulo idempotency
    *)
   Goal Z.max (b + c) (c + b) + a + Z.opp (c + b) = a.
+  Proof.
     aac_normalise.
     aac_rewrite H.
     aac_reflexivity.
   Qed.
 
   Goal Z.max c (Z.max b c) + a + Z.opp (Z.max c b) = a.
+  Proof.
     aac_normalise.
     aac_rewrite H.
     aac_reflexivity.
@@ -100,6 +105,7 @@ Section base.
     Variables a b c : X.
    
     Goal (a+b+c)*(c+a+b) == a+b+c.
+    Proof.
       aac_rewrite H.
       aac_reflexivity.
     Qed.
@@ -107,6 +113,7 @@ Section base.
     (** The tactic starts by normalising terms, so that trailing units
     are always eliminated *)
     Goal ((a+b)+0+c)*((c+a)+b*1) == a+b+c.
+    Proof.
       aac_rewrite H.
       aac_reflexivity.
     Qed.
@@ -125,6 +132,7 @@ Section base.
     Hypothesis H : forall x y, x+f (b+y) x == y+x.
 
     Goal g ((f (a+b) a) + a) == g (a+a).
+    Proof.
       aac_rewrite H.
       reflexivity.
     Qed.
@@ -143,6 +151,7 @@ Section base.
     Hypothesis H : forall x, x + x == x.
 
     Goal f(a+a)+f(a+a) == f a.
+    Proof.
       (* in case there are several possible solutions, one can print
         the different solutions using the [aac_instances] tactic (in
         ProofGeneral, look at the *Rocq* buffer): *)
@@ -163,6 +172,7 @@ Section base.
     Hypothesis H': forall x, x + x == x.
    
     Goal a*c*d*c*d*b  == a*c*d*b.
+    Proof.
       (* here, there is only one possible occurrence, but several substitutions: *)
       aac_instances H.
       (* one can select them with the proper keyword: *)
@@ -185,6 +195,7 @@ Section base.
     Hypothesis H': forall x, x + x == x.
    
     Goal a*c*d*c*d*b*b == a*(c*d*b)*b.
+    Proof.
       aac_instances H.
       aac_rewrite H at 1 subst 1.
       aac_instances H.
@@ -208,6 +219,7 @@ Section base.
     Hypothesis H: forall x, a*x*a == x.
 
     Goal a*a == 1.
+    Proof.
       (* here, [x] must be instantiated with [1], so that the [aac_*]
         tactics give no solutions: *)
       try aac_instances H.           
@@ -221,6 +233,7 @@ Section base.
       out dummy cases in common situations: *)
     Hypothesis H': forall x y z,  x*y + x*z == x*(y+z).
     Goal a*b*c + a*c + a*b == a*(c+b*(1+c)).
+    Proof.
       (* 6 solutions without units  *)
       aac_instances H'.        
       aac_rewrite H' at 0.
@@ -272,11 +285,13 @@ Section Peano.
   Variable a b c : nat.
 
   Goal Nat.max (a + 0) 0 = a.
+  Proof.
     aac_reflexivity.
   Qed.
 
   (** Here, we use idempotency: *)
   Goal Nat.max (a + 0) a = a.
+  Proof.
     aac_reflexivity.
   Qed.
    
@@ -284,10 +299,12 @@ Section Peano.
   Hypothesis H : forall x y z, Nat.max (x + y) (x + z) = x + Nat.max y z.
  
   Goal Nat.max (a + b) (c + (a * 1)) = Nat.max c b + a.
+  Proof.
     aac_instances H. aac_rewrite H. aac_reflexivity.
   Qed.
  
   Goal Nat.max (a + b) (c + Nat.max (a*1+0) 0) = a + Nat.max b c.
+  Proof.
     aac_instances H. aac_rewrite H. aac_reflexivity.
   Qed.
  
@@ -303,6 +320,7 @@ Section Peano.
 
   (** One can rewrite equations in the left member of inequations: *)
   Goal (forall x, x + x = x) -> a + b + b + a <= a + b.
+  Proof.
     intro Hx.
     aac_rewrite Hx.
     reflexivity.
@@ -310,6 +328,7 @@ Section Peano.
 
   (** Or in the right member of inequations, using the [in_right] keyword: *)
   Goal (forall x, x + x = x) -> a + b  <= a + b + b + a.
+  Proof.
     intro Hx.
     aac_rewrite Hx in_right.
     reflexivity.
@@ -317,6 +336,7 @@ Section Peano.
  
   (** Similarly, one can rewrite inequations in inequations: *)
   Goal (forall x, x + x <= x) -> a + b + b + a <= a + b.
+  Proof.
     intro Hx.
     aac_rewrite Hx.
     reflexivity.
@@ -324,6 +344,7 @@ Section Peano.
 
   (** Possibly in the right-hand side: *)
   Goal (forall x, x <= x + x) -> a + b <= a + b + b + a.
+  Proof.
     intro Hx.
     aac_rewrite <- Hx in_right.
     reflexivity.
@@ -331,6 +352,7 @@ Section Peano.
 
   (** [aac_reflexivity] deals with "trivial" inequations too: *)
   Goal Nat.max (a + b) (c + a) <= Nat.max (b + a) (c + 1*a).
+  Proof.
     aac_reflexivity.
   Qed.
 
@@ -362,22 +384,26 @@ Section AAC_normalise.
  
   Variable a b c d : Z.
   Goal a + (b + c*c*d) + a + 0 + d*1 = a.
+  Proof.
     aac_normalise.
   Abort.
 
   Goal b + 0 + a = c*1 -> a+b = c.
+  Proof.
     intro H.
     aac_normalise in H.
     assumption.
   Qed.
 
   Goal b + 0 + a = c*1+d -> a+b = d*(1+0)+c.
+  Proof.
     intro.
     aac_normalise in *.
     assumption.
   Qed.
   
   Goal Z.max (a+b) (b+a) = a+b.
+  Proof.
     aac_reflexivity.
   Abort.
 
@@ -403,10 +429,10 @@ Section Examples.
   (** *** Reverse triangle inequality *)
 
   Lemma Z_abs_triangle : forall x y, Z.abs (x + y) <= Z.abs x + Z.abs y.
-  Proof Z.abs_triangle.
+  Proof. exact Z.abs_triangle. Qed.
 
   Lemma Z_add_opp_diag_r : forall x, x + -x = 0.
-  Proof Z.add_opp_diag_r.
+  Proof. exact Z.add_opp_diag_r. Qed.
 
   (** The following morphisms are required to perform the required rewrites: *)
   #[local] Instance Z_opp_ge_le_compat : Proper (Z.ge ==> Z.le) Z.opp.
@@ -416,6 +442,7 @@ Section Examples.
   Proof. intros ? ? ? ? ? ?; lia. Qed.
 
   Goal forall a b, Z.abs a - Z.abs b <= Z.abs (a - b).
+  Proof.
     intros. unfold Z.sub.
     aac_instances <- (Z.sub_diag b).
     aac_rewrite <- (Z.sub_diag b) at 3.
@@ -427,7 +454,7 @@ Section Examples.
 
   (** *** Pythagorean triples *)
 
-  Notation "x ^2" := (x*x) (at level 40).
+  Notation "x ^2" := (x*x) (at level 1).
   Notation "2 ⋅ x" := (x+x) (at level 41).
 
   Lemma Hbin1: forall x y, (x+y)^2   = x^2 + y^2 +  2⋅x*y.
@@ -441,6 +468,7 @@ Section Examples.
   Hypothesis H : c^2 + 2⋅(a+1)*b  = (a+1+b)^2.
 
   Goal a^2 + b^2 + 2⋅a + 1 = c^2.
+  Proof.
     aacu_rewrite <- Hbin1.
     rewrite Hbin2.
     aac_rewrite <- H.
@@ -460,16 +488,19 @@ Section Lists.
   Variables (X : Type) (l1 l2 l3 : list X).
 
   Goal l1 ++ (l2 ++ l3) = (l1 ++ l2) ++ l3.
+  Proof.
     aac_reflexivity.
   Qed.
 
   Goal Permutation (l1 ++ l2) (l2 ++ l1).
+  Proof.
     aac_reflexivity.
   Qed.
 
   Hypothesis H : Permutation l1 l2.
 
   Goal Permutation (l1 ++ l3) (l3 ++ l2).
+  Proof.
     aac_rewrite H.
     aac_reflexivity.
   Qed.
@@ -483,10 +514,12 @@ Section Props.
   Variables (P Q : Prop).
 
   Goal (Q /\ P) <-> (P /\ (Q /\ True)).
+  Proof.
     aac_reflexivity.
   Qed.
 
   Goal (Q \/ P) <-> (P \/ (Q \/ False)).
+  Proof.
     aac_reflexivity.
   Qed.
 End Props.

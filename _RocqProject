@@ -1,6 +1,7 @@
 -generate-meta-for-package rocq-aac-tactics
+--rocq-package rocq-aac-tactics --legacy-support
+
 -Q theories AAC_tactics
--Q src AAC_tactics
 -I src
 
 src/rocq.mli

@@ -4,7 +4,7 @@ KNOWNFILES   := Makefile _RocqProject
 .DEFAULT_GOAL := invoke-rocqmakefile
 
 RocqMakefile: Makefile _RocqProject
-	$(ROCQBIN)rocq makefile -f _RocqProject -docroot . -o RocqMakefile
+	$(ROCQBIN)rocq makefile -f _RocqProject -o RocqMakefile
 
 invoke-rocqmakefile: RocqMakefile
 	$(MAKE) --no-print-directory -f RocqMakefile $(filter-out $(KNOWNTARGETS),$(MAKECMDGOALS))
