@@ -34,7 +34,6 @@ From AAC_tactics Require Import Utils Constants.
 
 Set Implicit Arguments.
 Set Asymmetric Patterns.
-#[warning="-unknown-option"] Set Asymmetric Patterns No Implicits.
 
 Local Open Scope signature_scope.
 
@@ -261,6 +260,8 @@ Section s.
      contains, among other things, the arity of symbols).
    *)
 
+  Scheme All for prod.
+  Scheme All for nelist.
   Inductive T: Type :=
   | sum: idx -> mset T -> T
   | prd: idx -> nelist T -> T
@@ -299,7 +300,7 @@ Section s.
       | vnil, vnil => Eq
       | vnil, _    => Lt
       | _,    vnil => Gt
-      | vcons _ u us, vcons _ v vs => lex (compare u v) (vcompare us vs)
+      | vcons u us, vcons v vs => lex (compare u v) (vcompare us vs)
     end.
 
   (** *** Evaluation from syntax to the abstract domain *)
@@ -315,7 +316,7 @@ Section s.
   with eval_aux i (v: vT i): Sym.type_of i -> X :=
     match v with
       | vnil => fun f => f
-      | vcons _ u v => fun f => eval_aux v (f (eval u))
+      | vcons u v => fun f => eval_aux v (f (eval u))
     end.
 
   Register eval as aac_tactics.internal.eval.
@@ -512,7 +513,7 @@ Section s.
   with vnorm i (l: vT i): vT i :=
     match l with
       | vnil => vnil
-      | vcons _ u l => vcons (norm u) (vnorm l)
+      | vcons u l => vcons (norm u) (vnorm l)
     end.
 
   (** *** Correctness *)
@@ -738,8 +739,8 @@ Section s.
   Proof.
     unfold norm_msets.
     assert (H : forall h : mset T,
-     (eval (sum i (run_msets (norm_msets_ i (is_unit_of i) norm h)))) ==
-     (eval (sum i h)) /\ compat_sum_unit (is_unit_of i) (norm_msets_ i (is_unit_of i) norm h)).
+     (eval (sum i (run_msets (norm_msets_ i (is_unit_of i) norm h))) ==
+     eval (sum i h)) /\ compat_sum_unit (is_unit_of i) (norm_msets_ i (is_unit_of i) norm h)).
     induction h as [[a n] | [a n] h [IHh IHh']]; simpl norm_msets_; split.
     - rewrite z1 by auto. rewrite Hnorm. reflexivity.
     - apply compat_sum_unit_return.
@@ -870,9 +871,9 @@ Section s.
    forall h, eval (prd i (norm_lists norm i h)) == eval (prd i h).
   Proof.
     unfold norm_lists.
-    assert (H :  forall h : nelist T,
-      (eval (prd i (run_list (norm_lists_ i (is_unit_of i) norm h)))) ==
-      (eval (prd i h))
+    assert (H : forall h : nelist T,
+      (eval (prd i (run_list (norm_lists_ i (is_unit_of i) norm h))) ==
+      eval (prd i h))
       /\ compat_prd_unit (is_unit_of i) (norm_lists_ i (is_unit_of i) norm h)). {   
       induction h as [a | a h [IHh IHh']]; simpl norm_lists_; split.
       rewrite z1'. simpl.  apply Hnorm.   
