@@ -322,15 +322,15 @@ type hypinfo =
 let get_hypinfo env sigma ?check_type c ~l2r : hypinfo =
   let ctype = Retyping.get_type_of env sigma c in
   let (rel_context, body_type) = decompose_prod_decls sigma ctype in
-  let rec check f e =
+  let rec check f k e =
     match decomp_term sigma e with
-    | Rel i -> f (get_type (Context.Rel.lookup i rel_context))
-    | _ -> fold sigma (fun acc x -> acc && check f x) true e
+    | Rel i -> i <= k || f (get_type (Context.Rel.lookup (i - k) rel_context))
+    | _ -> EConstr.fold_with_binders sigma succ (fun k acc x -> acc && check f k x) k true e
   in
   begin match check_type with
   | None -> ()
   | Some f ->
-     if not (check f body_type)
+     if not (check f 0 body_type)
      then user_error @@ Pp.strbrk "Unable to deal with higher-order or heterogeneous patterns";
   end;
   begin
